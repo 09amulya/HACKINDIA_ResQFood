@@ -6,7 +6,22 @@ const User = require("../models/User");
 function clamp(value) {
   return Math.max(0, Math.min(100, value));
 }
+function calculateDistance(loc1, loc2) {
+  const R = 6371; // Earth radius in km
 
+  const dLat = (loc2.lat - loc1.lat) * Math.PI / 180;
+  const dLng = (loc2.lng - loc1.lng) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(loc1.lat * Math.PI / 180) *
+    Math.cos(loc2.lat * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // distance in km
+}
 // -----------------------------
 // Core Algorithm
 // -----------------------------
@@ -61,15 +76,16 @@ exports.matchNGO = async (food) => {
   if (!ngos.length) return null;
 
   // 🔥 TEMP: add fake travelTime (we'll replace later)
-  const enriched = ngos.map(ngo => ({
-    ...ngo.toObject(),
-    travelTime: Math.random() * 90 * 60 * 1000 // 0–90 mins
-  }));
+  const enriched = ngos.map(ngo => {
+  const distanceKm = calculateDistance(food.location, ngo.location);
 
-  const results = enriched
-    .map(ngo => calculateFoodLifeScore(food, ngo))
-    .filter(r => r !== null)
-    .sort((a, b) => b.finalScore - a.finalScore);
+  // assume avg speed = 40 km/h
+  const travelTime = (distanceKm / 40) * 60 * 60 * 1000;
 
-  return results;
+    return {
+      ...ngo.toObject(),
+      travelTime,
+      distanceKm
+    };
+  });
 };

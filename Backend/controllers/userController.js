@@ -4,7 +4,26 @@ const { matchNGO } = require("../utils/matching");
 
 exports.testMatching = async (req, res) => {
   try {
-    const food = req.body;
+    const { quantity, expiryTime, location } = req.body;
+
+    // ✅ Step 1: Validation
+    if (!quantity || !expiryTime || !location) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    if (!location.lat || !location.lng) {
+      return res.status(400).json({ error: "Location must include lat & lng" });
+    }
+
+    // ✅ Step 2: Debug (VERY IMPORTANT for hackathon)
+    console.log("Incoming Data:", req.body);
+
+    // ✅ Step 3: Pass clean data
+    const food = {
+      quantity,
+      expiryTime,
+      location
+    };
 
     const result = await matchNGO(food);
 
@@ -31,12 +50,11 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 exports.getNGOs = async (req, res) => {
   try {
     const ngos = await User.find({ role: "ngo" });
     res.status(200).json(ngos);
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
