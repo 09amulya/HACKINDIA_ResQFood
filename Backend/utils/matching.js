@@ -73,14 +73,12 @@ function calculateFoodLifeScore(food, ngo) {
 exports.matchNGO = async (food) => {
   const ngos = await User.find({ role: "ngo", isActive: true });
 
-  if (!ngos.length) return null;
+  if (!ngos.length) return [];
 
-  // 🔥 TEMP: add fake travelTime (we'll replace later)
   const enriched = ngos.map(ngo => {
-  const distanceKm = calculateDistance(food.location, ngo.location);
+    const distanceKm = calculateDistance(food.location, ngo.location);
 
-  // assume avg speed = 40 km/h
-  const travelTime = (distanceKm / 40) * 60 * 60 * 1000;
+    const travelTime = (distanceKm / 40) * 60 * 60 * 1000;
 
     return {
       ...ngo.toObject(),
@@ -88,4 +86,11 @@ exports.matchNGO = async (food) => {
       distanceKm
     };
   });
+
+  const results = enriched
+    .map(ngo => calculateFoodLifeScore(food, ngo))
+    .filter(r => r !== null)
+    .sort((a, b) => b.finalScore - a.finalScore);
+
+  return results;
 };
