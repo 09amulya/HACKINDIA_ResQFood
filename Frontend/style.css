@@ -1245,3 +1245,47 @@
   border-radius: 20px;
   cursor: pointer;
 }
+/* ════════════════════════════════════════════
+   AUTH & DASHBOARD ADDITIONS
+   ════════════════════════════════════════════ */
+
+.btn-donate-header {
+  font-family: var(--display);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  background: var(--gold);
+  border: none;
+  border-radius: 5px;
+  color: #1a0f00;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.btn-donate-header:hover {
+  background: var(--gold2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(154,115,24,0.3);
+}
+
+.ngo-register-btn {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.ngo-register-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(154,115,24,0.06);
+}

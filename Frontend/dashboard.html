@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResQFood — NGO Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+body { align-items: stretch; }
+main { max-width: none; padding: 0; }
+.dash-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 73px); }
+/* SIDEBAR */
+.dash-sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 36px 24px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 73px; height: calc(100vh - 73px); overflow-y: auto; }
+.dash-sidebar-label { font-family: var(--mono); font-size: 0.48rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin: 20px 0 8px 10px; }
+.dash-nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 6px; font-family: var(--serif); font-size: 0.9rem; color: var(--text2); cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+.dash-nav-item:hover { background: var(--surface2); color: var(--text); }
+.dash-nav-item.active { background: rgba(154,115,24,0.12); border-color: rgba(154,115,24,0.25); color: var(--gold); font-weight: 600; }
+.dash-nav-item .nav-icon { font-size: 0.8rem; width: 18px; text-align: center; }
+.dash-sidebar-bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); }
+.logout-btn { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 6px; font-family: var(--serif); font-size: 0.9rem; color: var(--crimson); cursor: pointer; transition: all 0.2s; background: transparent; border: 1px solid transparent; width: 100%; }
+.logout-btn:hover { background: rgba(139,26,26,0.07); border-color: rgba(139,26,26,0.2); }
+/* MAIN CONTENT */
+.dash-content { padding: 40px 48px; overflow-y: auto; }
+.dash-header-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 36px; }
+.dash-greeting { font-family: var(--display); font-size: 1.7rem; font-weight: 700; color: var(--text); letter-spacing: 1px; }
+.dash-subtitle { font-family: var(--serif); font-size: 0.95rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+.status-badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 100px; background: rgba(30,92,58,0.1); border: 1px solid rgba(30,92,58,0.3); font-family: var(--mono); font-size: 0.52rem; letter-spacing: 2px; text-transform: uppercase; color: var(--green-hp); }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-hp); animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.2)} }
+/* STAT CARDS */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px 22px; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); }
+.stat-label { font-family: var(--mono); font-size: 0.48rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.stat-num { font-family: var(--display); font-size: 2rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; line-height: 1; }
+.stat-trend { font-family: var(--mono); font-size: 0.5rem; color: var(--green-hp); margin-top: 6px; }
+/* REQUEST CARDS */
+.section-title { font-family: var(--display); font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: 1px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.section-title .count-badge { font-family: var(--mono); font-size: 0.48rem; padding: 3px 9px; border-radius: 100px; background: rgba(154,115,24,0.15); border: 1px solid rgba(154,115,24,0.3); color: var(--gold); letter-spacing: 1px; }
+.request-list { display: flex; flex-direction: column; gap: 12px; }
+.request-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; transition: all 0.2s; }
+.request-card:hover { border-color: var(--border2); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.request-card.new { border-left: 3px solid var(--gold); }
+.request-card.urgent { border-left: 3px solid var(--crimson); }
+.req-food { font-family: var(--display); font-size: 0.9rem; font-weight: 600; color: var(--text); letter-spacing: 0.5px; margin-bottom: 6px; }
+.req-meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.req-chip { font-family: var(--mono); font-size: 0.48rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 9px; border-radius: 100px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+.req-chip.urgent-chip { background: rgba(139,26,26,0.08); border-color: rgba(139,26,26,0.25); color: var(--crimson); }
+.req-chip.new-chip { background: rgba(154,115,24,0.1); border-color: rgba(154,115,24,0.25); color: var(--gold); }
+.req-actions { display: flex; gap: 8px; }
+.req-btn { padding: 8px 16px; border-radius: 5px; font-family: var(--mono); font-size: 0.52rem; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: 1px solid; }
+.req-btn-accept { background: var(--gold); border-color: var(--gold); color: #1a0f00; font-weight: 700; }
+.req-btn-accept:hover { background: var(--gold2); transform: translateY(-1px); }
+.req-btn-decline { background: transparent; border-color: var(--border2); color: var(--muted); }
+.req-btn-decline:hover { border-color: var(--crimson); color: var(--crimson); }
+/* Empty state */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--muted); font-family: var(--serif); font-style: italic; }
+@media (max-width: 900px) { .dash-layout { grid-template-columns: 1fr; } .dash-sidebar { display: none; } .stat-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+<header>
+  <div class="logo" onclick="window.location.href='index.html'" title="Return to Home">
+    <div>ResQFood<span class="logo-subtitle">Order of the Meal · Est. 2026</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="status-badge"><div class="status-dot"></div>Active</div>
+    <button class="ngo-register-btn" onclick="logout()">Sign Out</button>
+  </div>
+</header>
+<main>
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-sidebar-label">Navigation</div>
+      <div class="dash-nav-item active"><span class="nav-icon">🏠</span> Overview</div>
+      <div class="dash-nav-item"><span class="nav-icon">📥</span> Requests</div>
+      <div class="dash-nav-item"><span class="nav-icon">✅</span> Completed</div>
+      <div class="dash-nav-item"><span class="nav-icon">📊</span> Analytics</div>
+      <div class="dash-sidebar-label">Settings</div>
+      <div class="dash-nav-item"><span class="nav-icon">⚙️</span> Profile</div>
+      <div class="dash-nav-item"><span class="nav-icon">🔔</span> Notifications</div>
+      <div class="dash-sidebar-bottom">
+        <button class="logout-btn" onclick="logout()">↩ &nbsp;Sign Out</button>
+      </div>
+    </div>
+    <div class="dash-content">
+      <div class="dash-header-row">
+        <div>
+          <div class="dash-greeting" id="dash-greeting">Welcome back, Ally</div>
+          <div class="dash-subtitle">Here's what's happening across your service area today.</div>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Meals Received</div><div class="stat-num">142</div><div class="stat-trend">↑ 12 this week</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Requests</div><div class="stat-num" id="pending-count">3</div><div class="stat-trend">Awaiting response</div></div>
+        <div class="stat-card"><div class="stat-label">Acceptance Rate</div><div class="stat-num">94%</div><div class="stat-trend">↑ 2% from last month</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Response</div><div class="stat-num">8 min</div><div class="stat-trend">Well within target</div></div>
+      </div>
+      <div class="section-title">Incoming Requests <span class="count-badge" id="req-count-badge">3 LIVE</span></div>
+      <div class="request-list" id="request-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const colors = ['rgba(201,162,39,0.8)','rgba(232,197,90,0.6)','rgba(139,26,26,0.4)'];
+    p.style.cssText = `left:${Math.random()*100}%;--dur:${6+Math.random()*8}s;--delay:${Math.random()*10}s;--drift:${(Math.random()-0.5)*120}px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;`;
+    container.appendChild(p);
+  }
+})();
+
+// Auth guard
+const token = localStorage.getItem('authToken');
+if (!token) window.location.href = 'auth.html';
+
+const ngoName = localStorage.getItem('ngoName') || 'Ally';
+const displayName = ngoName.charAt(0).toUpperCase() + ngoName.slice(1);
+document.getElementById('dash-greeting').textContent = `Welcome back, ${displayName}`;
+
+// Mock request data
+const mockRequests = [
+  { id: 1, food: 'Biryani', servings: 80, location: 'Connaught Place, Delhi', expiry: '1 hr', score: 88, donor: 'The Grand Ballroom', status: 'urgent' },
+  { id: 2, food: 'Bread & Pastries', servings: 120, location: 'Karol Bagh, Delhi', expiry: '3 hrs', score: 62, donor: 'City Bakery Co.', status: 'new' },
+  { id: 3, food: 'Cooked Dal & Rice', servings: 50, location: 'Lajpat Nagar, Delhi', expiry: '4 hrs', score: 47, donor: 'Home Kitchen', status: 'new' },
+];
+
+let activeRequests = [...mockRequests];
+
+function renderRequests() {
+  const list = document.getElementById('request-list');
+  document.getElementById('pending-count').textContent = activeRequests.length;
+  document.getElementById('req-count-badge').textContent = `${activeRequests.length} LIVE`;
+  if (activeRequests.length === 0) {
+    list.innerHTML = '<div class="empty-state">No pending requests at this time. You\'re all caught up.</div>';
+    return;
+  }
+  list.innerHTML = activeRequests.map(r => `
+    <div class="request-card ${r.status}" id="req-${r.id}">
+      <div>
+        <div class="req-food">${r.food}</div>
+        <div class="req-meta">
+          <span class="req-chip">${r.servings} servings</span>
+          <span class="req-chip ${r.status === 'urgent' ? 'urgent-chip' : 'new-chip'}">${r.expiry} — ${r.status === 'urgent' ? 'Critical' : 'Moderate'}</span>
+          <span class="req-chip">📍 ${r.location}</span>
+          <span class="req-chip">Score: ${r.score}</span>
+          <span class="req-chip">From: ${r.donor}</span>
+        </div>
+      </div>
+      <div class="req-actions">
+        <button class="req-btn req-btn-accept" onclick="acceptRequest(${r.id})">Accept</button>
+        <button class="req-btn req-btn-decline" onclick="declineRequest(${r.id})">Decline</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function acceptRequest(id) {
+  const card = document.getElementById(`req-${id}`);
+  if (card) { card.style.opacity = '0.5'; card.style.pointerEvents = 'none'; }
+  setTimeout(() => {
+    activeRequests = activeRequests.filter(r => r.id !== id);
+    renderRequests();
+  }, 600);
+}
+
+function declineRequest(id) {
+  activeRequests = activeRequests.filter(r => r.id !== id);
+  renderRequests();
+}
+
+function logout() {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('ngoName');
+  localStorage.removeItem('userType');
+  window.location.href = 'index.html';
+}
+
+renderRequests();
+</script>
+</body>
+</html>

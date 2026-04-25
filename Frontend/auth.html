@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResQFood — Join the Order</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+body { align-items: stretch; }
+main { max-width: none; padding: 0; }
+.auth-layout { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 73px); }
+.auth-panel { display: flex; flex-direction: column; justify-content: center; padding: 56px 64px; position: relative; z-index: 2; background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; }
+.auth-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 10% 10%, rgba(154,115,24,0.06) 0%, transparent 55%), radial-gradient(ellipse at 90% 90%, rgba(139,26,26,0.04) 0%, transparent 55%); pointer-events: none; }
+.auth-tab-row { display: flex; gap: 0; margin-bottom: 36px; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; width: fit-content; }
+.auth-tab { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; padding: 9px 22px; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: all 0.25s ease; }
+.auth-tab.active { background: var(--gold); color: #1a0f00; font-weight: 700; }
+.auth-tab:not(.active):hover { background: var(--surface2); color: var(--text); }
+.auth-heading { font-family: var(--display); font-size: 1.9rem; font-weight: 700; color: var(--text); letter-spacing: 1px; line-height: 1.2; margin-bottom: 8px; }
+.auth-sub { font-family: var(--serif); font-size: 1rem; color: var(--muted); margin-bottom: 32px; font-style: italic; }
+.social-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.social-btn { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border: 1px solid var(--border2); border-radius: 6px; background: var(--surface2); cursor: pointer; font-family: var(--serif); font-size: 0.95rem; color: var(--text2); transition: all 0.2s ease; width: 100%; text-align: left; }
+.social-btn:hover { background: var(--surface3); border-color: var(--gold); color: var(--text); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(154,115,24,0.12); }
+.social-btn-label { flex: 1; font-weight: 600; letter-spacing: 0.3px; }
+.auth-divider { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.auth-divider::before,.auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.auth-divider span { font-family: var(--mono); font-size: 0.55rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.auth-field { display: flex; flex-direction: column; gap: 6px; }
+.auth-field label { font-family: var(--mono); font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.auth-field input,.auth-field select,.auth-field textarea { padding: 11px 14px; border: 1px solid var(--border2); border-radius: 5px; background: var(--surface); font-family: var(--serif); font-size: 0.95rem; color: var(--text); transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none; width: 100%; }
+.auth-field input::placeholder,.auth-field textarea::placeholder { color: var(--muted); opacity: 0.7; }
+.auth-field input:focus,.auth-field select:focus,.auth-field textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(154,115,24,0.1); }
+.auth-submit { margin-top: 8px; padding: 14px 24px; background: var(--gold); border: none; border-radius: 6px; font-family: var(--display); font-size: 0.7rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #1a0f00; cursor: pointer; transition: all 0.25s ease; position: relative; overflow: hidden; }
+.auth-submit::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%); pointer-events: none; }
+.auth-submit:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(154,115,24,0.35); }
+.auth-submit.loading { opacity: 0.75; cursor: not-allowed; pointer-events: none; }
+.auth-switch { margin-top: 18px; text-align: center; font-family: var(--serif); font-size: 0.9rem; color: var(--muted); }
+.auth-switch a { color: var(--gold); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+.auth-switch a:hover { color: var(--gold2); }
+.auth-msg { display: none; padding: 11px 14px; border-radius: 5px; font-family: var(--serif); font-size: 0.9rem; margin-bottom: 4px; }
+.auth-msg.error { background: rgba(139,26,26,0.1); border: 1px solid var(--crimson); color: var(--crimson); }
+.auth-msg.success { background: rgba(30,92,58,0.1); border: 1px solid var(--green-hp); color: var(--green-hp); }
+.auth-msg.visible { display: block; }
+.brand-panel { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 64px 64px; background: var(--bg); position: relative; overflow: hidden; }
+.brand-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 25%, rgba(154,115,24,0.1) 0%, transparent 60%), radial-gradient(ellipse at 75% 80%, rgba(139,26,26,0.07) 0%, transparent 55%); pointer-events: none; }
+.brand-sigil { width: 72px; height: 72px; border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; position: relative; box-shadow: 0 0 28px rgba(154,115,24,0.18), inset 0 0 20px rgba(154,115,24,0.06); }
+.brand-sigil::before { content: '✦'; font-size: 1.6rem; color: var(--gold); position: absolute; }
+.brand-sigil-ring { position: absolute; inset: -8px; border: 1px solid rgba(154,115,24,0.2); border-radius: 50%; animation: slow-spin 20s linear infinite; }
+@keyframes slow-spin { to { transform: rotate(360deg); } }
+.brand-title { font-family: var(--display); font-size: 3rem; font-weight: 900; color: var(--gold); letter-spacing: 3px; line-height: 1; margin-bottom: 12px; position: relative; z-index: 1; }
+.brand-order-tag { font-family: var(--mono); font-size: 0.55rem; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; margin-bottom: 32px; position: relative; z-index: 1; }
+.brand-tagline { font-family: var(--serif); font-size: 1.35rem; font-style: italic; color: var(--text2); line-height: 1.6; max-width: 340px; margin-bottom: 40px; position: relative; z-index: 1; }
+.brand-tagline strong { color: var(--text); font-style: normal; }
+.brand-stats { display: flex; gap: 36px; position: relative; z-index: 1; }
+.brand-stat { display: flex; flex-direction: column; gap: 4px; }
+.brand-stat-num { font-family: var(--display); font-size: 1.6rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+.brand-stat-label { font-family: var(--mono); font-size: 0.5rem; letter-spacing: 2.5px; color: var(--muted); text-transform: uppercase; }
+.brand-divider { width: 48px; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); margin: 32px 0; position: relative; z-index: 1; }
+.brand-features { display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 1; }
+.brand-feature { display: flex; align-items: flex-start; gap: 12px; font-family: var(--serif); font-size: 0.92rem; color: var(--text2); }
+.brand-feature-icon { width: 22px; height: 22px; border-radius: 50%; background: rgba(154,115,24,0.12); border: 1px solid rgba(154,115,24,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+.section-sep { font-family: var(--mono); font-size: 0.5rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; }
+.section-sep::before { content: ''; width: 20px; height: 1px; background: var(--border2); }
+.onboarding-fields { display: none; flex-direction: column; gap: 14px; padding-top: 16px; border-top: 1px solid var(--border); margin-top: 4px; }
+.onboarding-fields.visible { display: flex; }
+.food-type-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.food-chip { padding: 5px 12px; border: 1px solid var(--border2); border-radius: 100px; font-family: var(--mono); font-size: 0.52rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.2s ease; background: var(--surface2); user-select: none; }
+.food-chip.selected { background: var(--gold); border-color: var(--gold); color: #1a0f00; font-weight: 700; }
+.food-chip:hover:not(.selected) { border-color: var(--gold); color: var(--text); }
+@media (max-width: 860px) { .auth-layout { grid-template-columns: 1fr; } .brand-panel { display: none; } .auth-panel { padding: 40px 28px; } }
+</style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+<header>
+  <div class="logo" onclick="window.location.href='index.html'" title="Return to Home">
+    <div>ResQFood<span class="logo-subtitle">Order of the Meal · Est. 2026</span></div>
+  </div>
+  <button class="ngo-register-btn" style="opacity:0.5;cursor:default;">Join the Order</button>
+</header>
+<main>
+  <div class="auth-layout">
+    <div class="auth-panel">
+      <div class="auth-tab-row">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="view-login">
+        <div class="auth-heading">Welcome Back</div>
+        <div class="auth-sub">Sign in to manage your incoming food requests.</div>
+        <div class="social-btns">
+          <button class="social-btn" onclick="handleSocialAuth('google')">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+            <span class="social-btn-label">Continue with Google</span>
+          </button>
+          
+        </div>
+        <div class="auth-divider"><span>or sign in with email</span></div>
+        <div class="auth-msg" id="login-msg"></div>
+        <div class="auth-form">
+          <div class="auth-field"><label>Email Address</label><input type="email" id="login-email" placeholder="coordinator@ngo.org" /></div>
+          <div class="auth-field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••" /></div>
+          <button class="auth-submit" id="login-btn" onclick="handleLogin()">✦ &nbsp;Enter the Order</button>
+        </div>
+        <div class="auth-switch">New NGO? <a onclick="switchTab('signup')">Create an account</a></div>
+      </div>
+
+      <!-- SIGNUP -->
+      <div id="view-signup" style="display:none;">
+        <div class="auth-heading">Join the Order</div>
+        <div class="auth-sub">Register your NGO to start receiving surplus food from local donors.</div>
+        <div class="social-btns">
+          <button class="social-btn" onclick="handleSocialAuth('google')">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+            <span class="social-btn-label">Sign up with Google</span>
+          </button>
+        </div>
+        <div class="auth-divider"><span>or register with email</span></div>
+        <div class="auth-msg" id="signup-msg"></div>
+        <div class="auth-form">
+          <div class="field-row">
+            <div class="auth-field"><label>Email Address</label><input type="email" id="signup-email" placeholder="coordinator@ngo.org" /></div>
+            <div class="auth-field"><label>Password</label><input type="password" id="signup-password" placeholder="Min. 8 characters" /></div>
+          </div>
+          <div class="onboarding-fields" id="ngo-fields">
+            <div class="section-sep">NGO Details</div>
+            <div class="auth-field"><label>Organisation Name</label><input type="text" id="ngo-name" placeholder="e.g. Annapoorna Foundation" /></div>
+            <div class="field-row">
+              <div class="auth-field"><label>Phone</label><input type="tel" id="ngo-phone" placeholder="+91 98100 00000" /></div>
+              <div class="auth-field"><label>Daily Capacity (meals)</label><input type="number" id="ngo-capacity" placeholder="e.g. 200" min="1" /></div>
+            </div>
+            <div class="auth-field"><label>Service Address</label><input type="text" id="ngo-address" placeholder="e.g. Connaught Place, New Delhi" /></div>
+            <div class="auth-field"><label>Operating Hours</label><input type="text" id="ngo-hours" placeholder="e.g. Mon–Sat, 8am – 8pm" /></div>
+            <div class="auth-field">
+              <label>Accepted Food Types</label>
+              <div class="food-type-chips" id="food-chips">
+                <span class="food-chip" onclick="toggleChip(this)">Cooked Meals</span>
+                <span class="food-chip" onclick="toggleChip(this)">Packaged Food</span>
+                <span class="food-chip" onclick="toggleChip(this)">Bread &amp; Bakery</span>
+                <span class="food-chip" onclick="toggleChip(this)">Fruits &amp; Veg</span>
+                <span class="food-chip" onclick="toggleChip(this)">Dairy</span>
+                <span class="food-chip" onclick="toggleChip(this)">Beverages</span>
+              </div>
+            </div>
+          </div>
+          <button class="auth-submit" id="signup-btn" onclick="handleSignup()">✦ &nbsp;Register as Ally</button>
+        </div>
+        <div class="auth-switch">Already registered? <a onclick="switchTab('login')">Sign in here</a></div>
+      </div>
+    </div>
+
+    <!-- BRAND PANEL -->
+    <div class="brand-panel">
+      <div class="brand-sigil"><div class="brand-sigil-ring"></div></div>
+      <div class="brand-title">ResQFood</div>
+      <div class="brand-order-tag">Order of the Meal · Est. 2026</div>
+      <div class="brand-tagline">Every meal saved is a <strong>life touched.</strong> Join a network of allied organisations routing surplus food to those who need it most — in real time.</div>
+      <div class="brand-stats">
+        <div class="brand-stat"><div class="brand-stat-num">2,400+</div><div class="brand-stat-label">Meals Rescued</div></div>
+        <div class="brand-stat"><div class="brand-stat-num">38</div><div class="brand-stat-label">NGO Allies</div></div>
+        <div class="brand-stat"><div class="brand-stat-num">12 min</div><div class="brand-stat-label">Avg Dispatch</div></div>
+      </div>
+      <div class="brand-divider"></div>
+      <div class="brand-features">
+        <div class="brand-feature"><div class="brand-feature-icon">⚡</div><span>Real-time routing engine matches food to the nearest verified ally automatically.</span></div>
+        <div class="brand-feature"><div class="brand-feature-icon">🔒</div><span>Verified NGO profiles — donors trust the network, you receive quality referrals.</span></div>
+        <div class="brand-feature"><div class="brand-feature-icon">📊</div><span>Dashboard analytics to track incoming requests, acceptance rate, and meals delivered.</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const colors = ['rgba(201,162,39,0.8)', 'rgba(232,197,90,0.6)', 'rgba(139,26,26,0.5)', 'rgba(64,145,108,0.5)'];
+    p.style.cssText = `left:${Math.random()*100}%;--dur:${6+Math.random()*8}s;--delay:${Math.random()*10}s;--drift:${(Math.random()-0.5)*120}px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;`;
+    container.appendChild(p);
+  }
+})();
+
+const userType = localStorage.getItem('userType') || 'ngo';
+if (userType === 'ngo') document.getElementById('ngo-fields').classList.add('visible');
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+  document.getElementById('view-login').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('view-signup').style.display = isLogin ? 'none' : 'block';
+  clearMsg('login-msg'); clearMsg('signup-msg');
+}
+
+function toggleChip(el) { el.classList.toggle('selected'); }
+
+function getSelectedFoodTypes() {
+  return Array.from(document.querySelectorAll('.food-chip.selected')).map(c => c.textContent.trim());
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = `auth-msg ${type} visible`;
+}
+
+function clearMsg(id) {
+  const el = document.getElementById(id);
+  el.className = 'auth-msg';
+  el.textContent = '';
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.classList.toggle('loading', loading);
+  if (!loading) btn.textContent = btnId === 'login-btn' ? '✦  Enter the Order' : '✦  Register as Ally';
+  else btn.textContent = 'Please wait…';
+}
+
+function handleSocialAuth(provider) {
+  const label = provider === 'google' ? 'Google' : 'GitHub';
+  showMsg('login-msg', `${label} OAuth is handled by the backend team. UI integration ready.`, 'error');
+  setTimeout(() => clearMsg('login-msg'), 3500);
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  clearMsg('login-msg');
+  if (!email || !password) { showMsg('login-msg', 'Please enter your email and password.', 'error'); return; }
+  setLoading('login-btn', true);
+  try {
+    const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    // Demo: treat any response (or network error) as success
+    localStorage.setItem('authToken', 'mock-token');
+    localStorage.setItem('ngoName', email.split('@')[0]);
+    showMsg('login-msg', 'Login successful! Redirecting to dashboard…', 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+  } catch (err) {
+    localStorage.setItem('authToken', 'mock-token');
+    localStorage.setItem('ngoName', email.split('@')[0]);
+    showMsg('login-msg', 'Connected (demo mode). Redirecting to dashboard…', 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+  } finally {
+    setLoading('login-btn', false);
+  }
+}
+
+async function handleSignup() {
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const ngoName = document.getElementById('ngo-name').value.trim();
+  const phone = document.getElementById('ngo-phone').value.trim();
+  const capacity = document.getElementById('ngo-capacity').value.trim();
+  const address = document.getElementById('ngo-address').value.trim();
+  const hours = document.getElementById('ngo-hours').value.trim();
+  const foodTypes = getSelectedFoodTypes();
+  clearMsg('signup-msg');
+  if (!email || !password) { showMsg('signup-msg', 'Email and password are required.', 'error'); return; }
+  if (password.length < 8) { showMsg('signup-msg', 'Password must be at least 8 characters.', 'error'); return; }
+  if (userType === 'ngo') {
+    if (!ngoName || !phone || !capacity || !address) { showMsg('signup-msg', 'Please fill in all NGO details.', 'error'); return; }
+    if (foodTypes.length === 0) { showMsg('signup-msg', 'Please select at least one accepted food type.', 'error'); return; }
+  }
+  setLoading('signup-btn', true);
+  const payload = { email, password, role: 'ngo', ngo: { name: ngoName, phone, capacity: parseInt(capacity)||0, address, operatingHours: hours, acceptedFoodTypes: foodTypes } };
+  try {
+    await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  } catch(e) {}
+  localStorage.setItem('authToken', 'mock-token');
+  localStorage.setItem('ngoName', ngoName || email.split('@')[0]);
+  showMsg('signup-msg', 'Registration successful! Welcome to the Order.', 'success');
+  setTimeout(() => window.location.href = 'dashboard.html', 1200);
+  setLoading('signup-btn', false);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const loginView = document.getElementById('view-login');
+    if (loginView.style.display !== 'none') handleLogin();
+    else handleSignup();
+  }
+});
+</script>
+</body>
+</html>

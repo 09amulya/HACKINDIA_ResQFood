@@ -40,12 +40,6 @@ let timerSec = 90;
 const CIRCUMFERENCE = 2 * Math.PI * 56; // ~351.9
 
 // MOCK DATA — NGO Registry
-//
-// travelTimeMin  : estimated minutes for NGO to reach pickup
-// capacityPerDay : total meals this NGO can handle per day
-// currentLoad    : meals already committed today
-// ngoDistanceKm  : road distance from donor's pickup location
-
 const NGO_REGISTRY = [
   {
     id: 'annapoorna',
@@ -80,22 +74,6 @@ const NGO_REGISTRY = [
 ];
 
 // CORE SCORING ENGINE
-//
-// calculateFoodLifeScore(food, ngo)
-//
-// Sub-scores (each 0-100):
-//   urgencyScore  — shorter expiry window = higher urgency.
-//                   1 hr -> 100  |  8 hrs -> 0
-//
-//   distanceScore — faster NGO travel = higher score.
-//                   0 min -> 100  |  60+ min -> 0
-//
-//   capacityScore — more available capacity = higher score.
-//                   100% free -> 100  |  0% free -> 0
-//
-// Final = urgencyScore x 0.45 + distanceScore x 0.35 + capacityScore x 0.20
-// Rounded to integer, capped 0-100.
-
 function calculateFoodLifeScore(food, ngo) {
   const MAX_EXPIRY_HRS = 8;
   const MAX_TRAVEL_MIN = 60;
@@ -125,15 +103,11 @@ function calculateFoodLifeScore(food, ngo) {
   return { finalScore, urgencyScore, distanceScore, capacityScore };
 }
 
-// PRIORITY LABEL + CSS CLASS from final score
-
 function getPriority(score) {
   if (score >= 70) return { label: 'High Priority',   cls: 'red'    };
   if (score >= 40) return { label: 'Medium Priority', cls: 'yellow' };
   return              { label: 'Low Priority',    cls: 'green'  };
 }
-
-// HELPERS
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
@@ -141,8 +115,14 @@ function showScreen(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// FORM SUBMIT -> Form -> Loading -> NGO -> Response -> Delivery
+// HEADER BUTTON LOGIC
+// goToAuth(type) — sets hidden role and redirects to auth page
+function goToAuth(type) {
+  localStorage.setItem('userType', type);
+  window.location.href = 'auth.html';
+}
 
+// FORM SUBMIT -> Form -> Loading -> NGO -> Response -> Delivery
 function submitForm() {
   const ft  = document.getElementById('food-type').value.trim();
   const qty = document.getElementById('quantity').value.trim();
@@ -164,7 +144,6 @@ function submitForm() {
 }
 
 // LOADER
-
 function runLoader() {
   const fill  = document.getElementById('progress-fill');
   const label = document.getElementById('loading-text');
@@ -195,10 +174,6 @@ function runLoader() {
   }, 650);
 }
 
-// calculateNGOScores()
-// Runs calculateFoodLifeScore for every NGO, enriches each
-// record with scores + priority, then calls selectBestNGO().
-
 function calculateNGOScores() {
   const food = { expiryHours: state.expiryHours, quantity: state.quantity };
 
@@ -226,9 +201,6 @@ function calculateNGOScores() {
   selectBestNGO();
 }
 
-//selectBestNGO()
-// Picks the NGO with the highest finalScore.
-
 function selectBestNGO() {
   let best = state.ngoList[0];
   state.ngoList.forEach((ngo) => {
@@ -236,10 +208,6 @@ function selectBestNGO() {
   });
   state.selectedNGO = best;
 }
-
-//updateUI()
-// Renders NGO cards sorted by score with full breakdown
-// and action buttons. Auto-highlights the optimal match.
 
 function updateUI() {
   const list = document.getElementById('ngo-dynamic-list');
@@ -291,7 +259,6 @@ function updateUI() {
             <span class="breakdown-key">C</span>
             <span class="breakdown-val">${ngo.capacityScore}</span>
           </span>
-
         </div>
       </div>
 
@@ -320,51 +287,21 @@ function updateUI() {
 
 // ACTION HANDLERS
 
-/**
- * handleCall(ngoId)
- * Simulates placing a call to the NGO coordinator.
- */
 function handleCall(ngoId) {
   const ngo = state.ngoList.find((n) => n.id === ngoId);
   if (!ngo) return;
-
-  showToast(
-    'Connecting to ' + ngo.name + '...',
-    'Dialling ' + ngo.phone,
-    'info'
-  );
-  console.log('[ResQFood] CALL initiated ->', ngo.name, '|', ngo.phone);
+  showToast('Connecting to ' + ngo.name + '...', 'Dialling ' + ngo.phone, 'info');
 }
 
-/**
- * handleRequest(ngoId)
- * Simulates dispatching a pickup request to a chosen NGO.
- * Overrides the auto-selected NGO if user picks a different one.
- */
 function handleRequest(ngoId) {
   const ngo = state.ngoList.find((n) => n.id === ngoId);
   if (!ngo) return;
-
   state.selectedNGO = ngo;
-
-  showToast(
-    'Request sent to ' + ngo.name,
-    'ETA: ~' + ngo.travelTimeMin + ' min  |  Score: ' + ngo.finalScore,
-    'success'
-  );
-  console.log(
-    '[ResQFood] DISPATCH ->', ngo.name,
-    '| Score:', ngo.finalScore,
-    '| ETA:', ngo.travelTimeMin, 'min'
-  );
-
+  showToast('Request sent to ' + ngo.name, 'ETA: ~' + ngo.travelTimeMin + ' min  |  Score: ' + ngo.finalScore, 'success');
   setTimeout(sendRequest, 2000);
 }
 
-//TOAST NOTIFICATION
-
 function showToast(title, subtitle, type) {
-  // Remove any existing toast first
   const existing = document.querySelector('.toast');
   if (existing) existing.remove();
 
@@ -375,7 +312,6 @@ function showToast(title, subtitle, type) {
     '<div class="toast-sub">' + subtitle + '</div>';
 
   document.body.appendChild(t);
-  // Trigger transition
   requestAnimationFrame(() => {
     requestAnimationFrame(() => t.classList.add('toast-visible'));
   });
@@ -385,8 +321,6 @@ function showToast(title, subtitle, type) {
     setTimeout(() => t.remove(), 400);
   }, 3200);
 }
-
-// SEND REQUEST (bottom CTA -> uses state.selectedNGO)
 
 function sendRequest() {
   document.getElementById('response-ngo-name').textContent = state.selectedNGO.name;
