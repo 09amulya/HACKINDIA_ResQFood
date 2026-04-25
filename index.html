@@ -3,48 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ResQFood — Real-Time Surplus Food Routing</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>ResQFood — The Order of the Meal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f6f0;
-    --surface: #ffffff;
-    --surface2: #eef1eb;
-    --border: #d8ddd3;
-    --accent: #1a7a3e;
-    --accent2: #22a052;
-    --red: #d93025;
-    --yellow: #d97706;
-    --green: #1a7a3e;
-    --text: #1a1f16;
-    --muted: #6b7869;
+    --bg: #f5efe0;
+    --surface: #fdf8ee;
+    --surface2: #f0e8d0;
+    --surface3: #e8dfc4;
+    --border: #d4c49a;
+    --border2: #c0ad80;
+    --gold: #9a7318;
+    --gold2: #b8891e;
+    --gold3: #d4a830;
+    --crimson: #8b1a1a;
+    --crimson2: #b03020;
+    --amber: #b85e08;
+    --amber2: #d07010;
+    --green-hp: #1e5c3a;
+    --green2: #2e7d52;
+    --parchment: #2c1f0a;
+    --parchment2: #3d2e10;
+    --text: #1e1408;
+    --text2: #4a3820;
+    --muted: #7a6040;
     --mono: 'Space Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --serif: 'Crimson Text', serif;
+    --display: 'Cinzel', serif;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html { scroll-behavior: smooth; }
+
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: var(--sans);
+    font-family: var(--serif);
+    font-size: 1.05rem;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
     overflow-x: hidden;
   }
 
-  /* === NOISE OVERLAY === */
+  /* === PARCHMENT TEXTURE BACKGROUND === */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.04;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(154,115,24,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(139,26,26,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(30,92,58,0.04) 0%, transparent 70%);
     pointer-events: none;
-    z-index: 9999;
+    z-index: 0;
+  }
+
+  /* Animated magical particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    animation: float-particle var(--dur, 8s) var(--delay, 0s) infinite ease-in-out;
+  }
+
+  @keyframes float-particle {
+    0% { opacity: 0; transform: translateY(100vh) translateX(0) scale(0); }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(-10vh) translateX(var(--drift, 40px)) scale(1.5); }
   }
 
   /* === HEADER === */
@@ -53,128 +93,223 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 40px;
+    padding: 18px 48px;
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
-    background: rgba(244,246,240,0.95);
-    backdrop-filter: blur(12px);
+    background: rgba(245,239,224,0.95);
+    backdrop-filter: blur(16px);
     z-index: 100;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.5;
   }
 
   .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-family: var(--sans);
-    font-size: 1.4rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    gap: 14px;
+    font-family: var(--display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--gold);
   }
 
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: var(--accent);
-    border-radius: 8px;
+  .logo-crest {
+    width: 38px; height: 38px;
+    position: relative;
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    color: #fff;
   }
 
-  .logo span { color: var(--accent); }
+  .logo-crest svg {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 0 4px rgba(154,115,24,0.35));
+  }
 
-  .badge {
+  .logo-subtitle {
     font-family: var(--mono);
-    font-size: 0.65rem;
-    padding: 4px 10px;
-    border: 1px solid var(--border);
+    font-size: 0.48rem;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .header-badge {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    padding: 5px 14px;
+    border: 1px solid var(--border2);
     border-radius: 100px;
     color: var(--muted);
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    background: rgba(154,115,24,0.07);
+    text-transform: uppercase;
   }
 
-  /* === MAIN WRAPPER === */
+  /* === MAIN === */
   main {
     width: 100%;
-    max-width: 680px;
-    padding: 48px 24px 80px;
+    max-width: 700px;
+    padding: 52px 28px 100px;
     flex: 1;
+    position: relative;
+    z-index: 2;
   }
 
   /* === SCREENS === */
-  .screen { display: none; animation: fadeSlide 0.45s cubic-bezier(.22,1,.36,1) both; }
+  .screen { display: none; animation: fadeScroll 0.55s cubic-bezier(.22,1,.36,1) both; }
   .screen.active { display: block; }
 
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(22px); }
+  @keyframes fadeScroll {
+    from { opacity: 0; transform: translateY(28px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* === STEP INDICATOR === */
+  /* === STEP PROGRESS === */
   .steps {
     display: flex;
     align-items: center;
-    gap: 0;
-    margin-bottom: 40px;
+    margin-bottom: 44px;
   }
 
   .step-dot {
-    width: 28px; height: 28px;
+    width: 30px; height: 30px;
     border-radius: 50%;
-    border: 2px solid var(--border);
-    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    background: var(--surface2);
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-family: var(--mono);
     color: var(--muted);
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
+    transition: all 0.4s ease;
+    flex-shrink: 0;
   }
 
-  .step-dot.done { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
-  .step-dot.active { border-color: var(--accent); color: var(--accent); }
+  .step-dot.done {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(201,162,39,0.4);
+  }
+
+  .step-dot.active {
+    border-color: var(--gold2);
+    color: var(--gold2);
+    box-shadow: 0 0 10px rgba(201,162,39,0.25);
+  }
 
   .step-line {
     flex: 1;
-    height: 2px;
+    height: 1px;
     background: var(--border);
-    position: relative;
   }
-  .step-line.done { background: var(--accent); }
 
-  /* === SECTION HEADER === */
+  .step-line.done {
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+  }
+
+  /* === SECTION HEADING === */
   .section-tag {
     font-family: var(--mono);
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    color: var(--accent);
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    color: var(--gold);
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    opacity: 0.8;
   }
 
-  h1, h2 {
-    font-family: var(--sans);
-    font-weight: 800;
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
     line-height: 1.1;
-    letter-spacing: -0.5px;
+    letter-spacing: 1px;
+    color: var(--parchment);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
 
-  h1 { font-size: clamp(2rem, 5vw, 2.8rem); }
-  h2 { font-size: clamp(1.5rem, 4vw, 2rem); }
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    line-height: 1.15;
+    letter-spacing: 0.5px;
+    color: var(--parchment);
+  }
 
   .subtitle {
-    color: var(--muted);
-    font-size: 0.95rem;
-    margin-top: 10px;
-    line-height: 1.6;
+    color: var(--text2);
+    font-size: 1rem;
+    margin-top: 12px;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* === DECORATIVE DIVIDER === */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 1rem;
+    margin: 20px 0;
+    opacity: 0.5;
+    letter-spacing: 8px;
+  }
+
+  /* === CARD === */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 36px;
+    margin-top: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(154,115,24,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Corner ornaments */
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 20px; height: 20px;
+    border-top: 2px solid var(--gold);
+    border-left: 2px solid var(--gold);
+    opacity: 0.4;
+  }
+
+  .card-corner-br {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 20px; height: 20px;
+    border-bottom: 2px solid var(--gold);
+    border-right: 2px solid var(--gold);
+    opacity: 0.4;
   }
 
   /* === FORM === */
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 18px;
     margin-top: 32px;
   }
 
@@ -188,91 +323,115 @@
 
   label {
     font-family: var(--mono);
-    font-size: 0.68rem;
-    letter-spacing: 1.5px;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
     color: var(--muted);
     text-transform: uppercase;
   }
 
   input, select {
-    background: var(--surface);
+    background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 3px;
     color: var(--text);
-    font-family: var(--sans);
-    font-size: 0.95rem;
-    padding: 14px 16px;
+    font-family: var(--serif);
+    font-size: 1rem;
+    padding: 13px 16px;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.25s, box-shadow 0.25s;
     appearance: none;
     width: 100%;
   }
 
-  input::placeholder { color: #b0b8ae; }
+  input::placeholder { color: var(--muted); font-style: italic; }
 
   input:focus, select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0,232,122,0.12);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(154,115,24,0.12), 0 0 12px rgba(154,115,24,0.06);
   }
 
   select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7869' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6a4a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
     cursor: pointer;
   }
 
-  select option { background: #ffffff; color: #1a1f16; }
+  select option { background: #fdf8ee; color: #1e1408; }
 
   /* === BUTTONS === */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     padding: 15px 28px;
-    border-radius: 12px;
+    border-radius: 3px;
     border: none;
     cursor: pointer;
-    font-family: var(--sans);
-    font-weight: 700;
-    font-size: 1rem;
-    transition: all 0.2s cubic-bezier(.22,1,.36,1);
-    letter-spacing: -0.2px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    transition: all 0.25s cubic-bezier(.22,1,.36,1);
+    text-transform: uppercase;
+    width: 100%;
+    margin-top: 20px;
   }
 
   .btn-primary {
-    background: var(--accent);
-    color: #fff;
-    width: 100%;
-    margin-top: 24px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--amber) 100%);
+    color: #0d0a06;
+    box-shadow: 0 4px 16px rgba(154,115,24,0.25);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    transition: opacity 0.25s;
   }
 
   .btn-primary:hover {
-    background: var(--accent2);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(26,122,62,0.2);
+    box-shadow: 0 8px 28px rgba(154,115,24,0.3);
+    background: linear-gradient(135deg, var(--gold2) 0%, var(--gold) 100%);
   }
 
   .btn-primary:active { transform: translateY(0); }
 
   .btn-outline {
     background: transparent;
-    color: var(--accent);
-    border: 1.5px solid var(--accent);
-    width: 100%;
+    color: var(--gold2);
+    border: 1px solid var(--border2);
     margin-top: 12px;
   }
 
-  .btn-outline:hover { background: rgba(0,232,122,0.07); }
+  .btn-outline:hover {
+    border-color: var(--gold);
+    background: rgba(154,115,24,0.07);
+  }
 
   .btn-danger {
-    background: var(--red);
+    background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson2) 100%);
     color: #fff;
-    width: 100%;
     margin-top: 12px;
   }
-  .btn-danger:hover { background: #ff5555; transform: translateY(-1px); }
+
+  .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,26,26,0.3); }
+
+  .btn-restart {
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    margin-top: 14px;
+    font-size: 0.75rem;
+  }
+
+  .btn-restart:hover { border-color: var(--border2); color: var(--text2); }
 
   /* === LOADING SCREEN === */
   .loader-wrap {
@@ -280,89 +439,80 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 0;
-    gap: 28px;
+    padding: 80px 0;
+    gap: 32px;
   }
 
-  .hex-loader {
+  /* Magical spinner - rotating runes ring */
+  .magic-spinner {
     position: relative;
-    width: 80px; height: 80px;
+    width: 100px; height: 100px;
   }
 
-  .hex-loader::before, .hex-loader::after {
-    content: '';
+  .magic-spinner svg {
+    animation: spinRune 4s linear infinite;
+    filter: drop-shadow(0 0 6px rgba(154,115,24,0.35));
+  }
+
+  .spinner-inner {
     position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    border: 2px solid transparent;
-  }
-
-  .hex-loader::before {
-    border-top-color: var(--accent);
-    border-right-color: var(--accent);
-    animation: spinA 1s linear infinite;
-  }
-
-  .hex-loader::after {
-    border-bottom-color: rgba(0,232,122,0.3);
-    border-left-color: rgba(0,232,122,0.3);
-    animation: spinB 1.3s linear infinite reverse;
-  }
-
-  .hex-inner {
-    position: absolute;
-    inset: 14px;
-    background: var(--surface);
-    border-radius: 10px;
+    inset: 20px;
+    border-radius: 50%;
+    background: var(--surface2);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem;
+    font-size: 2rem;
+    border: 1px solid var(--border);
   }
 
-  @keyframes spinA { to { transform: rotate(360deg); } }
-  @keyframes spinB { to { transform: rotate(-360deg); } }
+  @keyframes spinRune {
+    to { transform: rotate(360deg); }
+  }
 
-  .loader-label {
+  .loader-text {
     font-family: var(--mono);
-    font-size: 0.78rem;
-    letter-spacing: 2px;
-    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    color: var(--gold);
     text-align: center;
+    text-transform: uppercase;
   }
 
   .loader-dots span {
     display: inline-block;
-    animation: blink 1.2s infinite;
+    animation: blink 1.4s infinite;
+    color: var(--gold2);
   }
-  .loader-dots span:nth-child(2) { animation-delay: .2s; }
-  .loader-dots span:nth-child(3) { animation-delay: .4s; }
+  .loader-dots span:nth-child(2) { animation-delay: .25s; }
+  .loader-dots span:nth-child(3) { animation-delay: .5s; }
 
   @keyframes blink {
-    0%, 80%, 100% { opacity: 0; }
+    0%, 80%, 100% { opacity: 0.1; }
     40% { opacity: 1; }
   }
 
-  .progress-bar-track {
+  .progress-track {
     width: 100%;
-    height: 4px;
-    background: var(--surface2);
+    max-width: 280px;
+    height: 2px;
+    background: var(--border);
     border-radius: 100px;
     overflow: hidden;
-    margin-top: 8px;
   }
 
-  .progress-bar-fill {
+  .progress-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    background: linear-gradient(90deg, var(--amber), var(--gold2));
     border-radius: 100px;
-    transition: width 0.4s ease;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 6px rgba(154,115,24,0.4);
   }
 
   /* === SCORE CARD === */
   .score-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 20px;
+    border-radius: 4px;
     padding: 36px;
     margin-top: 28px;
     position: relative;
@@ -372,280 +522,354 @@
   .score-card::before {
     content: '';
     position: absolute;
-    top: -60px; right: -60px;
-    width: 180px; height: 180px;
+    top: -80px; right: -80px;
+    width: 200px; height: 200px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(26,122,62,0.07) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(154,115,24,0.06) 0%, transparent 70%);
     pointer-events: none;
   }
 
-  .score-num {
+  .score-label {
     font-family: var(--mono);
-    font-size: clamp(3.5rem, 10vw, 5rem);
-    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .score-num {
+    font-family: var(--display);
+    font-size: clamp(3.5rem, 10vw, 5.5rem);
+    font-weight: 900;
     line-height: 1;
     letter-spacing: -2px;
   }
 
-  .score-num.red { color: var(--red); }
-  .score-num.yellow { color: var(--yellow); }
-  .score-num.green { color: var(--green); }
-
-  .score-label {
-    font-family: var(--sans);
-    font-size: 1rem;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+  .score-num.red { color: var(--crimson2); text-shadow: 0 0 20px rgba(176,48,32,0.2); }
+  .score-num.yellow { color: var(--amber); text-shadow: 0 0 20px rgba(184,94,8,0.2); }
+  .score-num.green { color: var(--green2); text-shadow: 0 0 20px rgba(46,125,82,0.2); }
 
   .score-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 14px;
-    border-radius: 100px;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 2px;
     font-family: var(--mono);
-    font-size: 0.7rem;
-    letter-spacing: 1px;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
     font-weight: 700;
     margin-top: 16px;
+    text-transform: uppercase;
   }
 
-  .score-badge.red { background: rgba(217,48,37,0.1); color: var(--red); border: 1px solid rgba(217,48,37,0.25); }
-  .score-badge.yellow { background: rgba(217,119,6,0.1); color: var(--yellow); border: 1px solid rgba(217,119,6,0.25); }
-  .score-badge.green { background: rgba(26,122,62,0.1); color: var(--green); border: 1px solid rgba(26,122,62,0.25); }
+  .score-badge.red { background: rgba(139,26,26,0.08); color: var(--crimson2); border: 1px solid rgba(176,48,32,0.3); }
+  .score-badge.yellow { background: rgba(184,94,8,0.08); color: var(--amber); border: 1px solid rgba(184,94,8,0.3); }
+  .score-badge.green { background: rgba(30,92,58,0.08); color: var(--green2); border: 1px solid rgba(46,125,82,0.3); }
 
   .score-pulse {
-    width: 8px; height: 8px;
+    width: 6px; height: 6px;
     border-radius: 50%;
-    animation: pulse 1.5s ease infinite;
+    animation: pulse 1.8s ease infinite;
   }
-
-  .score-badge.red .score-pulse { background: var(--red); }
-  .score-badge.yellow .score-pulse { background: var(--yellow); }
-  .score-badge.green .score-pulse { background: var(--green); }
+  .score-badge.red .score-pulse { background: var(--crimson2); }
+  .score-badge.yellow .score-pulse { background: var(--amber); }
+  .score-badge.green .score-pulse { background: var(--green2); }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.5); }
+    50% { opacity: 0.4; transform: scale(1.6); }
   }
 
   .score-breakdown {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 28px;
     padding-top: 24px;
     border-top: 1px solid var(--border);
   }
 
   .score-factor {
     background: var(--surface2);
-    border-radius: 12px;
-    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px;
     text-align: center;
   }
 
   .factor-val {
-    font-family: var(--mono);
-    font-size: 1.1rem;
+    font-family: var(--display);
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--gold2);
   }
 
   .factor-name {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     color: var(--muted);
     margin-top: 4px;
     font-family: var(--mono);
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* === INFO CHIPS === */
+  .info-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .info-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 14px;
+    flex: 1;
+  }
+
+  .info-chip-label {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .info-chip-val {
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--parchment2);
   }
 
   /* === NGO CARDS === */
   .ngo-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     margin-top: 28px;
   }
 
   .ngo-card {
     background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
     padding: 20px 22px;
     display: flex;
     align-items: center;
     gap: 16px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
   }
 
-  .ngo-card:hover { border-color: #333; transform: translateX(4px); }
-
-  .ngo-card.best {
-    border-color: var(--accent);
-    background: rgba(26,122,62,0.04);
+  .ngo-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--border);
+    transition: background 0.3s;
   }
 
+  .ngo-card:hover {
+    border-color: var(--border2);
+    transform: translateX(6px);
+    background: var(--surface2);
+  }
+
+  .ngo-card:hover::before { background: var(--gold); }
+
+  .ngo-card.best {
+    border-color: rgba(154,115,24,0.5);
+    background: rgba(154,115,24,0.06);
+  }
+
+  .ngo-card.best::before { background: var(--gold2); }
+
   .ngo-card.best::after {
-    content: 'BEST MATCH';
+    content: 'OPTIMAL MATCH';
     position: absolute;
     top: 0; right: 0;
-    background: var(--accent);
-    color: #fff;
+    background: var(--gold);
+    color: #000;
     font-family: var(--mono);
-    font-size: 0.6rem;
+    font-size: 0.52rem;
     font-weight: 700;
     padding: 4px 10px;
-    border-radius: 0 14px 0 10px;
-    letter-spacing: 1px;
+    border-radius: 0 3px 0 6px;
+    letter-spacing: 1.5px;
   }
 
   .ngo-avatar {
-    width: 46px; height: 46px;
-    border-radius: 12px;
-    background: var(--surface2);
+    width: 48px; height: 48px;
+    border-radius: 3px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     flex-shrink: 0;
   }
 
-  .ngo-card.best .ngo-avatar { background: rgba(26,122,62,0.1); }
+  .ngo-card.best .ngo-avatar {
+    background: rgba(154,115,24,0.1);
+    border-color: rgba(154,115,24,0.35);
+  }
 
   .ngo-info { flex: 1; }
 
   .ngo-name {
-    font-weight: 700;
-    font-size: 1rem;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    color: var(--parchment);
   }
 
   .ngo-meta {
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.62rem;
     color: var(--muted);
-    margin-top: 3px;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
   }
 
-  .ngo-dist {
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .ngo-capacity {
-    margin-top: 6px;
-    height: 3px;
-    border-radius: 100px;
+  .ngo-capacity-bar {
+    margin-top: 8px;
+    height: 2px;
     background: var(--border);
+    border-radius: 100px;
     overflow: hidden;
   }
 
   .ngo-capacity-fill {
     height: 100%;
     border-radius: 100px;
-    background: var(--accent);
-    transition: width 1s ease 0.5s;
+    background: linear-gradient(90deg, var(--amber), var(--gold2));
+    transition: width 1.2s ease 0.5s;
+  }
+
+  .ngo-dist {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: right;
+    flex-shrink: 0;
   }
 
   /* === TIMER === */
   .timer-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 20px;
+    border-radius: 4px;
     padding: 40px;
     text-align: center;
     margin-top: 28px;
+    position: relative;
+    overflow: hidden;
   }
 
   .timer-circle {
     position: relative;
-    width: 120px; height: 120px;
-    margin: 0 auto 20px;
+    width: 130px; height: 130px;
+    margin: 0 auto 24px;
   }
 
   .timer-svg { transform: rotate(-90deg); }
-
-  .timer-track { fill: none; stroke: var(--surface2); stroke-width: 6; }
-
+  .timer-track { fill: none; stroke: var(--surface3); stroke-width: 5; }
   .timer-ring {
     fill: none;
-    stroke: var(--accent);
-    stroke-width: 6;
+    stroke: var(--gold);
+    stroke-width: 5;
     stroke-linecap: round;
-    stroke-dasharray: 339.3;
+    stroke-dasharray: 351.9;
     stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+    transition: stroke-dashoffset 1s linear, stroke 0.4s ease;
+    filter: drop-shadow(0 0 3px rgba(154,115,24,0.35));
   }
 
   .timer-num {
     position: absolute;
     inset: 0;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono);
-    font-size: 1.8rem;
+    font-family: var(--display);
+    font-size: 2rem;
     font-weight: 700;
+    color: var(--gold);
   }
 
   .timer-msg {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-top: 4px;
+    color: var(--text2);
+    font-size: 0.92rem;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  .timer-title {
+    font-family: var(--display);
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: var(--parchment);
   }
 
   .escalation-notice {
     display: none;
-    background: rgba(217,119,6,0.08);
-    border: 1px solid rgba(217,119,6,0.25);
-    border-radius: 12px;
+    background: rgba(212,119,14,0.08);
+    border: 1px solid rgba(212,119,14,0.25);
+    border-radius: 3px;
     padding: 14px 18px;
-    font-size: 0.85rem;
-    color: var(--yellow);
+    font-size: 0.82rem;
+    color: var(--amber2);
     font-family: var(--mono);
-    margin-top: 16px;
-    letter-spacing: 0.3px;
+    margin-top: 20px;
+    letter-spacing: 0.5px;
+    text-align: left;
   }
 
-  /* === DELIVERY PROGRESS === */
+  /* === DELIVERY TRACK === */
   .delivery-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 20px;
+    border-radius: 4px;
     padding: 36px;
     margin-top: 28px;
+    position: relative;
   }
 
   .success-icon {
-    width: 64px; height: 64px;
+    width: 68px; height: 68px;
     border-radius: 50%;
-    background: rgba(26,122,62,0.1);
-    border: 2px solid var(--accent);
+    background: rgba(30,92,58,0.08);
+    border: 2px solid var(--green-hp);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin-bottom: 20px;
-    animation: scaleIn 0.5s cubic-bezier(.22,1,.36,1) both;
+    animation: scaleIn 0.6s cubic-bezier(.22,1,.36,1) both;
+    box-shadow: 0 0 20px rgba(30,92,58,0.15);
   }
 
   @keyframes scaleIn {
-    from { transform: scale(0); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from { transform: scale(0) rotate(-20deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
   }
 
   .delivery-track {
     position: relative;
-    margin-top: 32px;
-    padding-top: 10px;
+    margin-top: 36px;
+    padding-top: 12px;
   }
 
   .track-line {
     position: absolute;
-    top: 22px;
-    left: 22px; right: 22px;
-    height: 2px;
+    top: 24px; left: 24px; right: 24px;
+    height: 1px;
     background: var(--border);
     z-index: 0;
   }
@@ -654,10 +878,11 @@
     position: absolute;
     top: 0; left: 0;
     height: 100%;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    background: linear-gradient(90deg, var(--green2), var(--gold));
     border-radius: 100px;
     width: 0%;
-    transition: width 2s ease 0.5s;
+    transition: width 2.2s ease 0.4s;
+    box-shadow: 0 0 6px rgba(64,145,108,0.5);
   }
 
   .track-steps {
@@ -675,36 +900,39 @@
   }
 
   .track-dot {
-    width: 44px; height: 44px;
+    width: 46px; height: 46px;
     border-radius: 50%;
-    background: var(--surface2);
-    border: 2px solid var(--border);
+    background: var(--surface3);
+    border: 1.5px solid var(--border);
     display: flex; align-items: center; justify-content: center;
     font-size: 1rem;
     transition: all 0.5s ease;
   }
 
   .track-dot.active {
-    background: rgba(26,122,62,0.1);
-    border-color: var(--accent);
-    box-shadow: 0 0 16px rgba(26,122,62,0.2);
+    background: rgba(30,92,58,0.1);
+    border-color: var(--green2);
+    box-shadow: 0 0 12px rgba(30,92,58,0.2);
   }
 
   .track-dot.done {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: var(--green-hp);
+    border-color: var(--green2);
+    box-shadow: 0 0 8px rgba(30,92,58,0.25);
   }
 
   .track-label {
     font-family: var(--mono);
-    font-size: 0.62rem;
+    font-size: 0.55rem;
     letter-spacing: 1px;
     color: var(--muted);
     text-align: center;
+    text-transform: uppercase;
   }
 
-  .track-label.active { color: var(--accent); }
+  .track-label.active { color: var(--green2); }
 
+  /* === SUMMARY CHIPS === */
   .summary-chips {
     display: flex;
     flex-wrap: wrap;
@@ -717,125 +945,106 @@
   .chip {
     background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 100px;
+    border-radius: 2px;
     padding: 5px 14px;
     font-family: var(--mono);
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     color: var(--muted);
     letter-spacing: 0.5px;
   }
 
-  .chip span { color: var(--text); }
+  .chip span { color: var(--parchment2); }
 
-  .btn-restart {
-    background: var(--surface2);
-    color: var(--muted);
-    border: 1.5px solid var(--border);
-    width: 100%;
-    margin-top: 16px;
-    font-size: 0.85rem;
-  }
-
-  .btn-restart:hover { color: var(--text); border-color: #444; }
-
-  /* === INFO GRID === */
-  .info-row {
+  /* === HOUSE BANNER (decorative element on form screen) === */
+  .house-banner {
     display: flex;
+    align-items: center;
     gap: 12px;
-    margin-top: 16px;
+    padding: 14px 18px;
+    background: rgba(154,115,24,0.07);
+    border: 1px solid rgba(154,115,24,0.25);
+    border-radius: 3px;
+    margin-top: 28px;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--text2);
   }
 
-  .info-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    flex: 1;
-  }
-
-  .info-chip-label {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .info-chip-val {
-    font-weight: 700;
-    font-size: 0.9rem;
-    margin-top: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* === DIVIDER === */
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 28px 0;
-  }
+  .house-banner .quote-icon { font-size: 1.5rem; flex-shrink: 0; }
 
   /* === RESPONSIVE === */
-  @media (max-width: 480px) {
-    header { padding: 16px 20px; }
-    main { padding: 32px 16px 60px; }
+  @media (max-width: 500px) {
+    header { padding: 14px 20px; }
+    main { padding: 36px 16px 70px; }
     .form-grid { grid-template-columns: 1fr; }
     .form-group.full { grid-column: 1; }
     .score-breakdown { grid-template-columns: 1fr 1fr; }
+    .info-row { flex-direction: column; }
+    h1 { font-size: 1.7rem; }
+    h2 { font-size: 1.4rem; }
+    .card { padding: 24px; }
   }
 </style>
 </head>
 <body>
 
+<!-- Magical floating particles -->
+<div class="particles" id="particles"></div>
+
 <header>
   <div class="logo">
-    <div class="logo-icon">🌿</div>
-    Res<span>Q</span>Food
+    <div class="logo-crest">
+      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 3L23 13H33L25 19L28 30L19 24L10 30L13 19L5 13H15L19 3Z" fill="rgba(154,115,24,0.15)" stroke="rgba(154,115,24,0.8)" stroke-width="1"/>
+        <circle cx="19" cy="19" r="5" fill="rgba(154,115,24,0.25)" stroke="rgba(154,115,24,0.7)" stroke-width="1"/>
+      </svg>
+    </div>
+    <div>
+      ResQFood
+      <span class="logo-subtitle">Order of the Meal · Est. 2024</span>
+    </div>
   </div>
-  <div class="badge">LIVE PROTOTYPE</div>
+  <div class="header-badge">⚗ Live Prototype</div>
 </header>
 
 <main>
 
-  <!-- ============================================================ -->
-  <!-- SCREEN 1: DONOR FORM                                         -->
-  <!-- ============================================================ -->
+  <!-- SCREEN 1: DONOR FORM -->
+
   <div class="screen active" id="screen-form">
     <div class="steps">
-      <div class="step-dot active" id="dot1">1</div>
+      <div class="step-dot active" id="dot1">I</div>
       <div class="step-line" id="line1"></div>
-      <div class="step-dot" id="dot2">2</div>
+      <div class="step-dot" id="dot2">II</div>
       <div class="step-line" id="line2"></div>
-      <div class="step-dot" id="dot3">3</div>
+      <div class="step-dot" id="dot3">III</div>
       <div class="step-line" id="line3"></div>
-      <div class="step-dot" id="dot4">4</div>
+      <div class="step-dot" id="dot4">IV</div>
       <div class="step-line" id="line4"></div>
-      <div class="step-dot" id="dot5">5</div>
+      <div class="step-dot" id="dot5">V</div>
     </div>
 
-    <div class="section-tag">— Donor Portal</div>
+    <div class="section-tag">— Donor's Scroll</div>
     <h1>Report Surplus<br>Food Now</h1>
-    <p class="subtitle">Our AI routing engine finds the nearest NGO in real time — reducing food waste one meal at a time.</p>
+    <p class="subtitle">Our enchanted routing engine finds the nearest Order member in real time no morsel left behind.</p>
 
     <div class="form-grid">
       <div class="form-group full">
         <label>Food Type</label>
-        <input type="text" id="food-type" placeholder="e.g. Biryani, Bread, Vegetables..." />
+        <input type="text" id="food-type" placeholder="e.g. Biryani, Bread, Vegetables…" />
       </div>
       <div class="form-group">
-        <label>Quantity (servings)</label>
+        <label>Servings Count</label>
         <input type="number" id="quantity" placeholder="e.g. 50" min="1" />
       </div>
       <div class="form-group">
         <label>Expiry Window</label>
         <select id="expiry">
-          <option value="">Select time</option>
-          <option value="1">1 hour (Critical)</option>
-          <option value="2">2 hours (Urgent)</option>
-          <option value="4">4 hours (Moderate)</option>
-          <option value="8">8 hours (Low)</option>
+          <option value="">Select urgency…</option>
+          <option value="1">1 hour — Critical Peril</option>
+          <option value="2">2 hours — Urgent Dispatch</option>
+          <option value="4">4 hours — Moderate Haste</option>
+          <option value="8">8 hours — Low Urgency</option>
         </select>
       </div>
       <div class="form-group full">
@@ -845,49 +1054,72 @@
     </div>
 
     <button class="btn btn-primary" onclick="submitForm()">
-      🚀 Calculate Food Life Score
+      ✦ Cast the Food Life Score Spell
     </button>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- SCREEN 2: PROCESSING                                         -->
-  <!-- ============================================================ -->
+ 
+  <!-- SCREEN 2: PROCESSING (Sorting Hat style) -->
   <div class="screen" id="screen-loading">
+    <div class="steps">
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot active">II</div>
+      <div class="step-line"></div>
+      <div class="step-dot">III</div>
+      <div class="step-line"></div>
+      <div class="step-dot">IV</div>
+      <div class="step-line"></div>
+      <div class="step-dot">V</div>
+    </div>
+
     <div class="loader-wrap">
-      <div class="hex-loader">
-        <div class="hex-inner">🌱</div>
+      <div class="magic-spinner">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(154,115,24,0.2)" stroke-width="2"/>
+          <!-- Rune marks -->
+          <text x="50" y="10" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">✦</text>
+          <text x="90" y="54" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">⚗</text>
+          <text x="50" y="97" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">✦</text>
+          <text x="10" y="54" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">⚗</text>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(154,115,24,0.35)" stroke-width="1" stroke-dasharray="4 8"/>
+        </svg>
+        <div class="spinner-inner"></div>
       </div>
-      <div>
-        <div class="loader-label" id="loading-text">ANALYZING FOOD DATA<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span></div>
-        <div class="progress-bar-track" style="margin-top:16px;">
-          <div class="progress-bar-fill" id="progress-fill"></div>
+
+      <div style="text-align:center;">
+        <div class="loader-text" id="loading-text">Analyzing real-time food data (Marauder’s Map)<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        <div class="progress-track" style="margin:16px auto 0;">
+          <div class="progress-fill" id="progress-fill"></div>
         </div>
       </div>
-      <p style="color:var(--muted);font-size:0.8rem;text-align:center;font-family:var(--mono);">Calculating Food Life Score<br>Matching NGO network...</p>
+
+      <p style="color:var(--muted);font-size:0.82rem;text-align:center;font-family:var(--mono);letter-spacing:1px;font-style:italic;">
+        The Sorting Hat is weighing<br>urgency, distance & capacity…
+      </p>
     </div>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- SCREEN 3: FOOD LIFE SCORE                                    -->
-  <!-- ============================================================ -->
+  <!-- SCREEN 3: FOOD LIFE SCORE-->
   <div class="screen" id="screen-score">
     <div class="steps">
-      <div class="step-dot done" id="dot1b">✓</div>
+      <div class="step-dot done">✓</div>
       <div class="step-line done"></div>
-      <div class="step-dot active">2</div>
-      <div class="step-line" id="line2b"></div>
-      <div class="step-dot">3</div>
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot active">III</div>
       <div class="step-line"></div>
-      <div class="step-dot">4</div>
+      <div class="step-dot">IV</div>
       <div class="step-line"></div>
-      <div class="step-dot">5</div>
+      <div class="step-dot">V</div>
     </div>
 
-    <div class="section-tag">— Food Life Score™</div>
-    <h2>Urgency Assessment<br>Complete</h2>
+    <div class="section-tag">— The Prophecy Scroll</div>
+    <h2>Food Life Score<br>Revealed</h2>
 
     <div class="score-card">
-      <div class="score-label">FOOD LIFE SCORE</div>
+      <div class="card-corner-br"></div>
+      <div class="score-label">Food Life Score™ — Enchanted Assessment</div>
       <div class="score-num" id="score-display">—</div>
       <div>
         <span class="score-badge" id="score-badge">
@@ -895,18 +1127,19 @@
           <span id="score-priority">—</span>
         </span>
       </div>
+
       <div class="score-breakdown">
         <div class="score-factor">
           <div class="factor-val" id="sf-urgency">—</div>
-          <div class="factor-name">Urgency</div>
+          <div class="factor-name"> Urgency</div>
         </div>
         <div class="score-factor">
           <div class="factor-val" id="sf-distance">—</div>
-          <div class="factor-name">Distance</div>
-        </div>
+          <div class="factor-name">🗺 Distance</div>
+        </div
         <div class="score-factor">
           <div class="factor-val" id="sf-capacity">—</div>
-          <div class="factor-name">Capacity</div>
+          <div class="factor-name"> Capacity</div>
         </div>
       </div>
     </div>
@@ -914,49 +1147,48 @@
     <div class="info-row" id="score-info-row"></div>
 
     <button class="btn btn-primary" onclick="goToNGO()">
-      View Matched NGOs →
+      View Matched Order Members →
     </button>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- SCREEN 4: NGO MATCHING                                       -->
-  <!-- ============================================================ -->
+  <!-- SCREEN 4: NGO MATCHING  -->
+
   <div class="screen" id="screen-ngo">
     <div class="steps">
       <div class="step-dot done">✓</div>
       <div class="step-line done"></div>
       <div class="step-dot done">✓</div>
       <div class="step-line done"></div>
-      <div class="step-dot active">3</div>
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot active">IV</div>
       <div class="step-line"></div>
-      <div class="step-dot">4</div>
-      <div class="step-line"></div>
-      <div class="step-dot">5</div>
+      <div class="step-dot">V</div>
     </div>
 
-    <div class="section-tag">— NGO Network</div>
-    <h2>3 Partners Found<br>Near You</h2>
-    <p class="subtitle">Best match selected automatically based on capacity, distance, and response history.</p>
+    <div class="section-tag">— The Order of the Meal Network</div>
+    <h2>3 Allied Houses<br>Nearby</h2>
+    <p class="subtitle">The Marauder's Map has located the finest allies — sorted by capacity, proximity, and legendary response time.</p>
 
     <div class="ngo-list">
       <div class="ngo-card best">
-        <div class="ngo-avatar">🏥</div>
+        <div class="ngo-avatar"></div>
         <div class="ngo-info">
           <div class="ngo-name">Annapoorna Foundation</div>
-          <div class="ngo-meta">Capacity: 200 meals/day &nbsp;·&nbsp; Avg response: 3 min</div>
-          <div class="ngo-capacity">
+          <div class="ngo-meta">Capacity: 200 feasts/day &nbsp;·&nbsp; Avg dispatch: 3 min</div>
+          <div class="ngo-capacity-bar">
             <div class="ngo-capacity-fill" style="width:85%"></div>
           </div>
         </div>
-        <div class="ngo-dist">2 km<br><span style="color:var(--accent);font-size:0.65rem">OPTIMAL</span></div>
+        <div class="ngo-dist">2 km<br><span style="color:var(--gold2);font-size:0.6rem;font-family:var(--mono);">OPTIMAL</span></div>
       </div>
 
       <div class="ngo-card">
-        <div class="ngo-avatar">🤝</div>
+        <div class="ngo-avatar"></div>
         <div class="ngo-info">
           <div class="ngo-name">Robin Hood Army</div>
-          <div class="ngo-meta">Capacity: 150 meals/day &nbsp;·&nbsp; Avg response: 8 min</div>
-          <div class="ngo-capacity">
+          <div class="ngo-meta">Capacity: 150 feasts/day &nbsp;·&nbsp; Avg dispatch: 8 min</div>
+          <div class="ngo-capacity-bar">
             <div class="ngo-capacity-fill" style="width:60%"></div>
           </div>
         </div>
@@ -964,11 +1196,11 @@
       </div>
 
       <div class="ngo-card">
-        <div class="ngo-avatar">🌍</div>
+        <div class="ngo-avatar"></div>
         <div class="ngo-info">
           <div class="ngo-name">Feeding India Hub</div>
-          <div class="ngo-meta">Capacity: 300 meals/day &nbsp;·&nbsp; Avg response: 15 min</div>
-          <div class="ngo-capacity">
+          <div class="ngo-meta">Capacity: 300 feasts/day &nbsp;·&nbsp; Avg dispatch: 15 min</div>
+          <div class="ngo-capacity-bar">
             <div class="ngo-capacity-fill" style="width:45%"></div>
           </div>
         </div>
@@ -977,13 +1209,12 @@
     </div>
 
     <button class="btn btn-primary" onclick="sendRequest()">
-      📡 Send Request to Annapoorna Foundation
+      📡 Send Owl Post to Annapoorna Foundation
     </button>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- SCREEN 5: NGO RESPONSE TIMER                                 -->
-  <!-- ============================================================ -->
+ <!-- SCREEN 5: NGO RESPONSE TIMER-->
+
   <div class="screen" id="screen-response">
     <div class="steps">
       <div class="step-dot done">✓</div>
@@ -992,41 +1223,40 @@
       <div class="step-line done"></div>
       <div class="step-dot done">✓</div>
       <div class="step-line done"></div>
-      <div class="step-dot active">4</div>
-      <div class="step-line"></div>
-      <div class="step-dot">5</div>
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot active">V</div>
     </div>
 
-    <div class="section-tag">— Awaiting NGO Response</div>
-    <h2>Request Sent to<br>Annapoorna Foundation</h2>
+    <div class="section-tag">— Awaiting the Owl's Return</div>
+    <h2>Owl Post Dispatched to<br>Annapoorna Foundation</h2>
 
     <div class="timer-wrap">
       <div class="timer-circle">
-        <svg class="timer-svg" width="120" height="120" viewBox="0 0 120 120">
-          <circle class="timer-track" cx="60" cy="60" r="54"/>
-          <circle class="timer-ring" id="timer-ring" cx="60" cy="60" r="54"/>
+        <svg class="timer-svg" width="130" height="130" viewBox="0 0 130 130">
+          <circle class="timer-track" cx="65" cy="65" r="56"/>
+          <circle class="timer-ring" id="timer-ring" cx="65" cy="65" r="56"/>
         </svg>
         <div class="timer-num" id="timer-display">90</div>
       </div>
-      <div style="font-weight:700;font-size:1rem;">Waiting for confirmation</div>
-      <div class="timer-msg">NGO coordinator is being notified via SMS + App</div>
+      <div class="timer-title">Awaiting confirmation…</div>
+      <div class="timer-msg">The Order coordinator is being notified by owl & patronus</div>
 
       <div class="escalation-notice" id="escalation-msg">
-        ⚠️ No response received. Escalating to Robin Hood Army (5 km)...
+        No owl returned. Escalating to Robin Hood Army (5 km)…
       </div>
     </div>
 
     <button class="btn btn-primary" id="accept-btn" onclick="acceptDelivery()">
-      ✅ Simulate: NGO Accepts
+      Simulate: Order Accepts the Feast
     </button>
     <button class="btn btn-outline" onclick="triggerEscalation()">
-      ⚡ Simulate: No Response (Escalate)
+      Simulate: No Owl Response (Escalate)
     </button>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- SCREEN 6: FINAL DELIVERY SCREEN                              -->
-  <!-- ============================================================ -->
+ <!-- SCREEN 6: FINAL DELIVERY SCREEN-->
+
   <div class="screen" id="screen-final">
     <div class="steps">
       <div class="step-dot done">✓</div>
@@ -1040,13 +1270,14 @@
       <div class="step-dot done">✓</div>
     </div>
 
-    <div class="section-tag">— Mission Complete</div>
-    <h2>Food Successfully<br>Assigned! 🎉</h2>
+    <div class="section-tag">— Mission Accomplished</div>
+    <h2>Feast Successfully<br>Conjured!</h2>
 
     <div class="delivery-card">
-      <div class="success-icon">✅</div>
-      <div style="font-size:1.05rem;font-weight:700;">Delivery in Progress</div>
-      <p class="subtitle" style="margin-top:6px;">Annapoorna Foundation volunteer is on the way to your location.</p>
+      <div class="card-corner-br"></div>
+      <div class="success-icon"></div>
+      <div style="font-family:var(--display);font-size:1.05rem;letter-spacing:1px;color:var(--parchment);">Delivery Charm Active</div>
+      <p class="subtitle" style="margin-top:8px;">An Annapoorna Foundation volunteer is riding a broomstick to your location.</p>
 
       <div class="delivery-track">
         <div class="track-line">
@@ -1062,8 +1293,8 @@
             <div class="track-label active">Matched</div>
           </div>
           <div class="track-step">
-            <div class="track-dot active" id="td3">🚗</div>
-            <div class="track-label active">Pickup</div>
+            <div class="track-dot active" id="td3">🧹</div>
+            <div class="track-label active">En Route</div>
           </div>
           <div class="track-step">
             <div class="track-dot" id="td4">🏠</div>
@@ -1076,19 +1307,40 @@
     </div>
 
     <button class="btn btn-primary" onclick="simulateDelivery()" id="deliver-btn">
-      ▶ Simulate Delivery Complete
+      Simulate Feast Delivered
     </button>
     <button class="btn btn-restart btn" onclick="restart()">
-      ↩ Submit Another Donation
+      Submit Another Donation
     </button>
   </div>
 
 </main>
 
 <script>
-  // ─────────────────────────────────────────────────────
+ 
+  // MAGICAL PARTICLES
+
+  (function() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 28; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const colors = ['rgba(201,162,39,0.8)', 'rgba(232,197,90,0.6)', 'rgba(139,26,26,0.5)', 'rgba(64,145,108,0.5)'];
+      p.style.cssText = `
+        left: ${Math.random() * 100}%;
+        --dur: ${6 + Math.random() * 8}s;
+        --delay: ${Math.random() * 10}s;
+        --drift: ${(Math.random() - 0.5) * 120}px;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        width: ${1 + Math.random() * 2}px;
+        height: ${1 + Math.random() * 2}px;
+      `;
+      container.appendChild(p);
+    }
+  })();
+
   // STATE
-  // ─────────────────────────────────────────────────────
+
   let state = {
     foodType: '', quantity: 0, expiry: 0, location: '',
     score: 0, urgency: 0, distance: 0, capacity: 0,
@@ -1097,11 +1349,11 @@
 
   let timerInterval = null;
   let timerSec = 90;
-  const CIRCUMFERENCE = 2 * Math.PI * 54; // 339.3
+  const CIRCUMFERENCE = 2 * Math.PI * 56; // ~351.9
 
-  // ─────────────────────────────────────────────────────
+ 
   // HELPERS
-  // ─────────────────────────────────────────────────────
+
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -1112,9 +1364,9 @@
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  // ─────────────────────────────────────────────────────
+  
   // FORM SUBMIT
-  // ─────────────────────────────────────────────────────
+
   function submitForm() {
     const ft = document.getElementById('food-type').value.trim();
     const qty = document.getElementById('quantity').value.trim();
@@ -1122,7 +1374,7 @@
     const loc = document.getElementById('location').value.trim();
 
     if (!ft || !qty || !exp || !loc) {
-      alert('Please fill in all fields before submitting.');
+      alert('Please fill all fields before casting the spell!');
       return;
     }
 
@@ -1135,18 +1387,17 @@
     runLoader();
   }
 
-  // ─────────────────────────────────────────────────────
-  // LOADER ANIMATION
-  // ─────────────────────────────────────────────────────
+  // LOADER
+
   function runLoader() {
     const fill = document.getElementById('progress-fill');
     const label = document.getElementById('loading-text');
     const steps = [
-      [0, 'PARSING FOOD METADATA'],
-      [25, 'CALCULATING EXPIRY URGENCY'],
-      [55, 'SCANNING NGO NETWORK'],
-      [80, 'COMPUTING FOOD LIFE SCORE'],
-      [100, 'SCORE READY']
+      [0,  'CONSULTING THE MARAUDER\'S MAP'],
+      [22, 'CALCULATING EXPIRY URGENCY'],
+      [50, 'SCANNING THE ORDER NETWORK'],
+      [78, 'COMPUTING FOOD LIFE SCORE'],
+      [100,'PROPHECY READY']
     ];
 
     let i = 0;
@@ -1157,16 +1408,16 @@
         return;
       }
       fill.style.width = steps[i][0] + '%';
-      label.childNodes[0].nodeValue = steps[i][1];
+      const textNode = label.childNodes[0];
+      if (textNode) textNode.nodeValue = steps[i][1];
+      else label.firstChild.textContent = steps[i][1];
       i++;
-    }, 600);
+    }, 650);
   }
 
-  // ─────────────────────────────────────────────────────
-  // COMPUTE FOOD LIFE SCORE
-  // ─────────────────────────────────────────────────────
+  // COMPUTE SCORE
+
   function computeScore() {
-    // Urgency: 1h=40, 2h=30, 4h=20, 8h=10
     const urgencyMap = { 1: 40, 2: 30, 4: 20, 8: 10 };
     const urgency = urgencyMap[state.expiry];
     const distance = rand(20, 35);
@@ -1178,16 +1429,15 @@
     state.capacity = capacity;
     state.score = total;
 
-    // Classification
     if (total >= 80) {
       state.scoreClass = 'red';
-      state.priorityLabel = '🔴 HIGH PRIORITY';
+      state.priorityLabel = ' CRITICAL';
     } else if (total >= 60) {
       state.scoreClass = 'yellow';
-      state.priorityLabel = '🟡 MEDIUM PRIORITY';
+      state.priorityLabel = ' MEDIUM';
     } else {
       state.scoreClass = 'green';
-      state.priorityLabel = '🟢 LOW PRIORITY';
+      state.priorityLabel = ' LOW';
     }
 
     renderScore();
@@ -1198,7 +1448,6 @@
     const s = state;
     const el = id => document.getElementById(id);
 
-    // Animated counter
     el('score-display').className = 'score-num ' + s.scoreClass;
     let count = 0;
     const target = s.score;
@@ -1209,21 +1458,18 @@
       if (count >= target) clearInterval(counter);
     }, 40);
 
-    // Badge
     const badge = el('score-badge');
     badge.className = 'score-badge ' + s.scoreClass;
     el('score-priority').textContent = s.priorityLabel;
 
-    // Breakdown
     el('sf-urgency').textContent = s.urgency + '/40';
     el('sf-distance').textContent = s.distance + '/35';
     el('sf-capacity').textContent = s.capacity + '/25';
 
-    // Info chips
     const expiryLabel = { 1: '1 hr (Critical)', 2: '2 hrs (Urgent)', 4: '4 hrs (Moderate)', 8: '8 hrs (Low)' };
     el('score-info-row').innerHTML = `
       <div class="info-chip">
-        <div class="info-chip-label">Food Type</div>
+        <div class="info-chip-label"> Food Type</div>
         <div class="info-chip-val">${s.foodType}</div>
       </div>
       <div class="info-chip">
@@ -1237,9 +1483,8 @@
     `;
   }
 
-  // ─────────────────────────────────────────────────────
-  // NGO SCREEN
-  // ─────────────────────────────────────────────────────
+  //  NGO SCREEN
+  
   function goToNGO() {
     showScreen('screen-ngo');
   }
@@ -1247,22 +1492,16 @@
   function sendRequest() {
     showScreen('screen-response');
     startTimer();
-    // Auto simulate escalation after 5 seconds
-    setTimeout(() => {
-      if (document.getElementById('screen-response').classList.contains('active')) {
-        // Don't auto-escalate; just let user click
-      }
-    }, 5000);
   }
 
-  // ─────────────────────────────────────────────────────
-  // COUNTDOWN TIMER
-  // ─────────────────────────────────────────────────────
+  //TIMER
+  
   function startTimer() {
     timerSec = 90;
     const ring = document.getElementById('timer-ring');
     const display = document.getElementById('timer-display');
-    ring.style.stroke = 'var(--accent)';
+    ring.style.stroke = 'var(--gold)';
+    ring.style.filter = 'drop-shadow(0 0 3px rgba(154,115,24,0.35))';
     document.getElementById('escalation-msg').style.display = 'none';
 
     if (timerInterval) clearInterval(timerInterval);
@@ -1274,8 +1513,14 @@
       const offset = CIRCUMFERENCE * (1 - timerSec / 90);
       ring.style.strokeDashoffset = offset;
 
-      if (timerSec <= 30) ring.style.stroke = 'var(--yellow)';
-      if (timerSec <= 10) ring.style.stroke = 'var(--red)';
+      if (timerSec <= 30) {
+        ring.style.stroke = 'var(--amber)';
+        ring.style.filter = 'drop-shadow(0 0 3px rgba(184,94,8,0.35))';
+      }
+      if (timerSec <= 10) {
+        ring.style.stroke = 'var(--crimson2)';
+        ring.style.filter = 'drop-shadow(0 0 3px rgba(176,48,32,0.35))';
+      }
 
       if (timerSec <= 0) {
         clearInterval(timerInterval);
@@ -1308,7 +1553,7 @@
     document.getElementById('final-chips').innerHTML = `
       <div class="chip">🍱 <span>${state.foodType}</span></div>
       <div class="chip">👥 <span>${state.quantity} servings</span></div>
-      <div class="chip">⏱ Expiry: <span>${expiryLabel[state.expiry]}</span></div>
+      <div class="chip">⏱ <span>${expiryLabel[state.expiry]}</span></div>
       <div class="chip">📍 <span>${state.location}</span></div>
       <div class="chip">⚡ Score: <span>${state.score}</span></div>
     `;
@@ -1321,7 +1566,7 @@
   function animateTrack() {
     setTimeout(() => {
       document.getElementById('track-fill').style.width = '66%';
-    }, 400);
+    }, 500);
   }
 
   function simulateDelivery() {
@@ -1335,12 +1580,11 @@
       document.getElementById('td4').classList.remove('active');
       document.getElementById('td4').classList.add('done');
       document.getElementById('td4').textContent = '✓';
-    }, 2000);
+    }, 2200);
   }
 
-  // ─────────────────────────────────────────────────────
-  // RESTART
-  // ─────────────────────────────────────────────────────
+  //RESTART
+  
   function restart() {
     clearInterval(timerInterval);
     document.getElementById('food-type').value = '';
