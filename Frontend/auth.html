@@ -236,7 +236,7 @@ async function handleLogin() {
   if (!email || !password) { showMsg('login-msg', 'Please enter your email and password.', 'error'); return; }
   setLoading('login-btn', true);
   try {
-    const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const res = await fetch('http://localhost:5000/api/users/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
     // Demo: treat any response (or network error) as success
     localStorage.setItem('authToken', 'mock-token');
     localStorage.setItem('ngoName', email.split('@')[0]);
@@ -269,11 +269,52 @@ async function handleSignup() {
     if (foodTypes.length === 0) { showMsg('signup-msg', 'Please select at least one accepted food type.', 'error'); return; }
   }
   setLoading('signup-btn', true);
-  const payload = { email, password, role: 'ngo', ngo: { name: ngoName, phone, capacity: parseInt(capacity)||0, address, operatingHours: hours, acceptedFoodTypes: foodTypes } };
-  try {
-    await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-  } catch(e) {}
-  localStorage.setItem('authToken', 'mock-token');
+  const payload = {
+  email,
+  password,
+  name: ngoName,
+  phone,
+  role: "ngo",
+  capacity: parseInt(capacity),
+  address,
+  operatingHours: hours,
+  acceptedFoodTypes: foodTypes,
+
+  location: {
+    lat: 28.6,   // TEMP (Delhi)
+    lng: 77.2
+  }
+};
+  
+  // registration is successful and return mock token
+  const res = await fetch('http://localhost:5000/api/users/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload)
+});
+
+const data = await res.json();
+try {
+if (!res.ok) {
+  setLoading('signup-btn', false); // ❗ important
+  throw new Error(data.message || "Registration failed");
+}
+
+// ✅ SUCCESS
+showMsg('signup-msg', 'Registration successful!', 'success');
+
+// ❗ THIS WAS MISSING (MAIN FIX)
+setLoading('signup-btn', false);
+
+setTimeout(() => {
+  window.location.href = 'dashboard.html';
+}, 1200);
+}
+catch (err) {
+  showMsg('signup-msg', err.message, 'error');
+  setLoading('signup-btn', false);
+}
+// 
   localStorage.setItem('ngoName', ngoName || email.split('@')[0]);
   showMsg('signup-msg', 'Registration successful! Welcome to the Order.', 'success');
   setTimeout(() => window.location.href = 'dashboard.html', 1200);

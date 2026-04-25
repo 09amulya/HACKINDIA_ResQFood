@@ -39,39 +39,48 @@ let timerInterval = null;
 let timerSec = 90;
 const CIRCUMFERENCE = 2 * Math.PI * 56; // ~351.9
 
-// MOCK DATA — NGO Registry
-const NGO_REGISTRY = [
-  {
-    id: 'annapoorna',
-    name: 'Annapoorna Foundation',
-    travelTimeMin: 8,
-    capacityPerDay: 200,
-    currentLoad: 40,
-    ngoDistanceKm: 2,
-    dispatchMin: 3,
-    phone: '+91-98100-11111',
-  },
-  {
-    id: 'robinhood',
-    name: 'Robin Hood Army',
-    travelTimeMin: 18,
-    capacityPerDay: 150,
-    currentLoad: 90,
-    ngoDistanceKm: 5,
-    dispatchMin: 8,
-    phone: '+91-98100-22222',
-  },
-  {
-    id: 'feedingindia',
-    name: 'Feeding India Hub',
-    travelTimeMin: 30,
-    capacityPerDay: 300,
-    currentLoad: 165,
-    ngoDistanceKm: 8,
-    dispatchMin: 15,
-    phone: '+91-98100-33333',
-  },
-];
+// real DATA — NGO Registry
+async function calculateNGOScores() {
+  try {
+    // Convert expiry hours → actual timestamp
+    const expiryTime = new Date(Date.now() + state.expiryHours * 60 * 60 * 1000);
+
+    const res = await fetch("http://localhost:5000/api/users/match", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        quantity: state.quantity,
+        expiryTime: expiryTime
+      })
+    });
+
+    const data = await res.json();
+
+    // Map backend response to frontend format
+    state.ngoList = data.map((ngo, index) => ({
+      id: index,
+      name: ngo.name,
+      finalScore: Math.round(ngo.finalScore),
+      urgencyScore: Math.round(ngo.urgencyScore),
+      distanceScore: Math.round(ngo.distanceScore),
+      capacityScore: Math.round(ngo.capacityScore),
+      travelTimeMin: Math.floor(Math.random() * 30) + 5, // TEMP
+      ngoDistanceKm: Math.floor(Math.random() * 10) + 1, // TEMP
+      capacityPerDay: 100,
+      currentLoad: 20,
+      priorityLabel: "Dynamic",
+      priorityClass: "yellow"
+    }));
+
+    selectBestNGO();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error connecting to backend");
+  }
+}
 
 // CORE SCORING ENGINE
 function calculateFoodLifeScore(food, ngo) {
