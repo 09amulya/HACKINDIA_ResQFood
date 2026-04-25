@@ -15,12 +15,7 @@
 
 <header>
   <div class="logo">
-    <div class="logo-crest">
-      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19 3L23 13H33L25 19L28 30L19 24L10 30L13 19L5 13H15L19 3Z" fill="rgba(154,115,24,0.15)" stroke="rgba(154,115,24,0.8)" stroke-width="1"/>
-        <circle cx="19" cy="19" r="5" fill="rgba(154,115,24,0.25)" stroke="rgba(154,115,24,0.7)" stroke-width="1"/>
-      </svg>
-    </div>
+
     <div>
       ResQFood
       <span class="logo-subtitle">Order of the Meal · Est. 2024</span>
@@ -32,23 +27,20 @@
 <main>
 
   <!-- SCREEN 1: DONOR FORM -->
-
   <div class="screen active" id="screen-form">
     <div class="steps">
-      <div class="step-dot active" id="dot1">I</div>
-      <div class="step-line" id="line1"></div>
-      <div class="step-dot" id="dot2">II</div>
-      <div class="step-line" id="line2"></div>
-      <div class="step-dot" id="dot3">III</div>
-      <div class="step-line" id="line3"></div>
-      <div class="step-dot" id="dot4">IV</div>
-      <div class="step-line" id="line4"></div>
-      <div class="step-dot" id="dot5">V</div>
+      <div class="step-dot active">I</div>
+      <div class="step-line"></div>
+      <div class="step-dot">II</div>
+      <div class="step-line"></div>
+      <div class="step-dot">III</div>
+      <div class="step-line"></div>
+      <div class="step-dot">IV</div>
     </div>
 
     <div class="section-tag">— Donor's Scroll</div>
     <h1>Report Surplus<br>Food Now</h1>
-    <p class="subtitle">Our enchanted routing engine finds the nearest Order member in real time no morsel left behind.</p>
+    <p class="subtitle">Our intelligent routing engine identifies the nearest Order ally in real time — no meal left behind.</p>
 
     <div class="form-grid">
       <div class="form-group full">
@@ -76,12 +68,11 @@
     </div>
 
     <button class="btn btn-primary" onclick="submitForm()">
-      ✦ Cast the Food Life Score Spell
+      ✦ Initiate Routing Protocol
     </button>
   </div>
 
- 
-  <!-- SCREEN 2: PROCESSING (Sorting Hat style) -->
+  <!-- SCREEN 2: PROCESSING -->
   <div class="screen" id="screen-loading">
     <div class="steps">
       <div class="step-dot done">✓</div>
@@ -91,39 +82,36 @@
       <div class="step-dot">III</div>
       <div class="step-line"></div>
       <div class="step-dot">IV</div>
-      <div class="step-line"></div>
-      <div class="step-dot">V</div>
     </div>
 
     <div class="loader-wrap">
       <div class="magic-spinner">
         <svg width="100" height="100" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(154,115,24,0.2)" stroke-width="2"/>
-          <!-- Rune marks -->
-          <text x="50" y="10" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">✦</text>
-          <text x="90" y="54" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">⚗</text>
-          <text x="50" y="97" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">✦</text>
-          <text x="10" y="54" text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">⚗</text>
+          <text x="50" y="10"  text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">✦</text>
+          <text x="90" y="54"  text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">⚗</text>
+          <text x="50" y="97"  text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">✦</text>
+          <text x="10" y="54"  text-anchor="middle" font-size="8" fill="rgba(154,115,24,0.7)" font-family="serif">⚗</text>
           <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(154,115,24,0.35)" stroke-width="1" stroke-dasharray="4 8"/>
         </svg>
         <div class="spinner-inner"></div>
       </div>
 
       <div style="text-align:center;">
-        <div class="loader-text" id="loading-text">Analyzing real-time food data (Marauder’s Map)<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        <div class="loader-text" id="loading-text">Consulting the Marauder's Map<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span></div>
         <div class="progress-track" style="margin:16px auto 0;">
           <div class="progress-fill" id="progress-fill"></div>
         </div>
       </div>
 
-      <p style="color:var(--muted);font-size:0.82rem;text-align:center;font-family:var(--mono);letter-spacing:1px;font-style:italic;">
-        The Sorting Hat is weighing<br>urgency, distance & capacity…
+      <p class="loader-caption">
+        Weighing urgency, proximity &amp; ally capacity…
       </p>
     </div>
   </div>
 
-  <!-- SCREEN 3: FOOD LIFE SCORE-->
-  <div class="screen" id="screen-score">
+  <!-- SCREEN 3: NGO MATCHING  (score embedded in each card)-->
+  <div class="screen" id="screen-ngo">
     <div class="steps">
       <div class="step-dot done">✓</div>
       <div class="step-line done"></div>
@@ -132,111 +120,19 @@
       <div class="step-dot active">III</div>
       <div class="step-line"></div>
       <div class="step-dot">IV</div>
-      <div class="step-line"></div>
-      <div class="step-dot">V</div>
-    </div>
-
-    <div class="section-tag">— The Prophecy Scroll</div>
-    <h2>Food Life Score<br>Revealed</h2>
-
-    <div class="score-card">
-      <div class="card-corner-br"></div>
-      <div class="score-label">Food Life Score™ — Enchanted Assessment</div>
-      <div class="score-num" id="score-display">—</div>
-      <div>
-        <span class="score-badge" id="score-badge">
-          <span class="score-pulse"></span>
-          <span id="score-priority">—</span>
-        </span>
-      </div>
-
-      <div class="score-breakdown">
-        <div class="score-factor">
-          <div class="factor-val" id="sf-urgency">—</div>
-          <div class="factor-name"> Urgency</div>
-        </div>
-        <div class="score-factor">
-          <div class="factor-val" id="sf-distance">—</div>
-          <div class="factor-name">🗺 Distance</div>
-        </div
-        <div class="score-factor">
-          <div class="factor-val" id="sf-capacity">—</div>
-          <div class="factor-name"> Capacity</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="info-row" id="score-info-row"></div>
-
-    <button class="btn btn-primary" onclick="goToNGO()">
-      View Matched Order Members →
-    </button>
-  </div>
-
-  <!-- SCREEN 4: NGO MATCHING  -->
-
-  <div class="screen" id="screen-ngo">
-    <div class="steps">
-      <div class="step-dot done">✓</div>
-      <div class="step-line done"></div>
-      <div class="step-dot done">✓</div>
-      <div class="step-line done"></div>
-      <div class="step-dot done">✓</div>
-      <div class="step-line done"></div>
-      <div class="step-dot active">IV</div>
-      <div class="step-line"></div>
-      <div class="step-dot">V</div>
     </div>
 
     <div class="section-tag">— The Order of the Meal Network</div>
-    <h2>3 Allied Houses<br>Nearby</h2>
-    <p class="subtitle">The Marauder's Map has located the finest allies — sorted by capacity, proximity, and legendary response time.</p>
+    <h2>Allied Houses<br>Identified</h2>
+    <p class="subtitle">The routing engine has scored every ally by proximity, capacity, and expiry urgency — ranked for optimal dispatch.</p>
 
-    <div class="ngo-list">
-      <div class="ngo-card best">
-        <div class="ngo-avatar"></div>
-        <div class="ngo-info">
-          <div class="ngo-name">Annapoorna Foundation</div>
-          <div class="ngo-meta">Capacity: 200 feasts/day &nbsp;·&nbsp; Avg dispatch: 3 min</div>
-          <div class="ngo-capacity-bar">
-            <div class="ngo-capacity-fill" style="width:85%"></div>
-          </div>
-        </div>
-        <div class="ngo-dist">2 km<br><span style="color:var(--gold2);font-size:0.6rem;font-family:var(--mono);">OPTIMAL</span></div>
-      </div>
+    <!-- NGO cards rendered dynamically by showNGOWithScores() -->
+    <div class="ngo-list" id="ngo-dynamic-list"></div>
 
-      <div class="ngo-card">
-        <div class="ngo-avatar"></div>
-        <div class="ngo-info">
-          <div class="ngo-name">Robin Hood Army</div>
-          <div class="ngo-meta">Capacity: 150 feasts/day &nbsp;·&nbsp; Avg dispatch: 8 min</div>
-          <div class="ngo-capacity-bar">
-            <div class="ngo-capacity-fill" style="width:60%"></div>
-          </div>
-        </div>
-        <div class="ngo-dist">5 km</div>
-      </div>
 
-      <div class="ngo-card">
-        <div class="ngo-avatar"></div>
-        <div class="ngo-info">
-          <div class="ngo-name">Feeding India Hub</div>
-          <div class="ngo-meta">Capacity: 300 feasts/day &nbsp;·&nbsp; Avg dispatch: 15 min</div>
-          <div class="ngo-capacity-bar">
-            <div class="ngo-capacity-fill" style="width:45%"></div>
-          </div>
-        </div>
-        <div class="ngo-dist">8 km</div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" onclick="sendRequest()">
-      📡 Send Owl Post to Annapoorna Foundation
-    </button>
   </div>
 
- <!-- SCREEN 5: NGO RESPONSE TIMER-->
-
+  <!-- SCREEN 4: NGO RESPONSE TIMER -->
   <div class="screen" id="screen-response">
     <div class="steps">
       <div class="step-dot done">✓</div>
@@ -245,13 +141,11 @@
       <div class="step-line done"></div>
       <div class="step-dot done">✓</div>
       <div class="step-line done"></div>
-      <div class="step-dot done">✓</div>
-      <div class="step-line done"></div>
-      <div class="step-dot active">V</div>
+      <div class="step-dot active">IV</div>
     </div>
 
-    <div class="section-tag">— Awaiting the Owl's Return</div>
-    <h2>Owl Post Dispatched to<br>Annapoorna Foundation</h2>
+    <div class="section-tag">— Awaiting Confirmation</div>
+    <h2 id="response-heading">Request Dispatched</h2>
 
     <div class="timer-wrap">
       <div class="timer-circle">
@@ -262,27 +156,26 @@
         <div class="timer-num" id="timer-display">90</div>
       </div>
       <div class="timer-title">Awaiting confirmation…</div>
-      <div class="timer-msg">The Order coordinator is being notified by owl & patronus</div>
+      <div class="timer-msg">
+        The Order coordinator at <strong id="response-ngo-name">—</strong> is being notified via secured channel.
+      </div>
 
       <div class="escalation-notice" id="escalation-msg">
-        No owl returned. Escalating to Robin Hood Army (5 km)…
+        No response received. Escalating to next available ally…
       </div>
     </div>
 
-    <button class="btn btn-primary" id="accept-btn" onclick="acceptDelivery()">
-      Simulate: Order Accepts the Feast
+    <button class="btn btn-primary" onclick="acceptDelivery()">
+      Simulate: Ally Accepts the Request
     </button>
     <button class="btn btn-outline" onclick="triggerEscalation()">
-      Simulate: No Owl Response (Escalate)
+      Simulate: No Response — Escalate
     </button>
   </div>
 
- <!-- SCREEN 6: FINAL DELIVERY SCREEN-->
-
+  <!-- SCREEN 5: FINAL DELIVERY -->
   <div class="screen" id="screen-final">
     <div class="steps">
-      <div class="step-dot done">✓</div>
-      <div class="step-line done"></div>
       <div class="step-dot done">✓</div>
       <div class="step-line done"></div>
       <div class="step-dot done">✓</div>
@@ -293,13 +186,13 @@
     </div>
 
     <div class="section-tag">— Mission Accomplished</div>
-    <h2>Feast Successfully<br>Conjured!</h2>
+    <h2>Pickup Confirmed &amp;<br>Coordinator Dispatched</h2>
 
     <div class="delivery-card">
       <div class="card-corner-br"></div>
       <div class="success-icon"></div>
-      <div style="font-family:var(--display);font-size:1.05rem;letter-spacing:1px;color:var(--parchment);">Delivery Charm Active</div>
-      <p class="subtitle" style="margin-top:8px;">An Annapoorna Foundation volunteer is riding a broomstick to your location.</p>
+      <div class="delivery-ngo-label" id="final-ngo-name">—</div>
+      <p class="subtitle" id="final-subtitle" style="margin-top:8px;"></p>
 
       <div class="delivery-track">
         <div class="track-line">
@@ -315,7 +208,7 @@
             <div class="track-label active">Matched</div>
           </div>
           <div class="track-step">
-            <div class="track-dot active" id="td3">🧹</div>
+            <div class="track-dot active" id="td3">→</div>
             <div class="track-label active">En Route</div>
           </div>
           <div class="track-step">
@@ -329,7 +222,7 @@
     </div>
 
     <button class="btn btn-primary" onclick="simulateDelivery()" id="deliver-btn">
-      Simulate Feast Delivered
+      Confirm Feast Delivered
     </button>
     <button class="btn btn-restart btn" onclick="restart()">
       Submit Another Donation
@@ -339,6 +232,5 @@
 </main>
 
 <script src="script.js"></script>
-
 </body>
 </html>
