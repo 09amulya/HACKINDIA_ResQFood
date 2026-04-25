@@ -23,7 +23,26 @@
     container.appendChild(p);
   }
 })();
+// 📍 Get user's real location (NO API NEEDED)
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject("Geolocation not supported");
+    }
 
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+      },
+      () => {
+        reject("Location permission denied");
+      }
+    );
+  });
+}
 // APPLICATION STATE
 
 let state = {
@@ -38,13 +57,21 @@ let state = {
 let timerInterval = null;
 let timerSec = 90;
 const CIRCUMFERENCE = 2 * Math.PI * 56; // ~351.9
+let coords;
+
 
 // real DATA — NGO Registry
 async function calculateNGOScores() {
   try {
     // Convert expiry hours → actual timestamp
     const expiryTime = new Date(Date.now() + state.expiryHours * 60 * 60 * 1000);
-
+    try {
+      coords = await getUserLocation();
+      console.log("User location:", coords);
+    } catch (err) {
+      console.warn("Using fallback location");
+      coords = { lat: 28.6139, lng: 77.2090 }; // fallback
+    }
     const res = await fetch("http://localhost:5000/api/users/match", {
       method: "POST",
       headers: {
@@ -52,30 +79,50 @@ async function calculateNGOScores() {
       },
       body: JSON.stringify({
         quantity: state.quantity,
-        expiryTime: expiryTime
+        expiryTime: expiryTime,
+        location: {
+          lat: coords.lat,
+          lng: coords.lng
+        }
       })
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    console.log("RAW RESPONSE:", text);
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Invalid JSON from backend");
+      return;
+    }
 
     // Map backend response to frontend format
-    state.ngoList = data.map((ngo, index) => ({
+    state.ngoList = data.map((ngo, index) => {
+  const p = getPriority(Math.round(ngo.finalScore));
+
+    return {
       id: index,
       name: ngo.name,
       finalScore: Math.round(ngo.finalScore),
       urgencyScore: Math.round(ngo.urgencyScore),
       distanceScore: Math.round(ngo.distanceScore),
       capacityScore: Math.round(ngo.capacityScore),
-      travelTimeMin: Math.floor(Math.random() * 30) + 5, // TEMP
-      ngoDistanceKm: Math.floor(Math.random() * 10) + 1, // TEMP
+
+      travelTimeMin: Math.floor(Math.random() * 30) + 5, 
+      ngoDistanceKm: Math.floor(Math.random() * 10) + 1,
+
       capacityPerDay: 100,
       currentLoad: 20,
-      priorityLabel: "Dynamic",
-      priorityClass: "yellow"
-    }));
+
+      priorityLabel: p.label,
+      priorityClass: p.cls
+    };
+  });
 
     selectBestNGO();
-
+    
   } catch (err) {
     console.error(err);
     alert("Error connecting to backend");
@@ -113,9 +160,9 @@ function calculateFoodLifeScore(food, ngo) {
 }
 
 function getPriority(score) {
-  if (score >= 70) return { label: 'High Priority',   cls: 'red'    };
-  if (score >= 40) return { label: 'Medium Priority', cls: 'yellow' };
-  return              { label: 'Low Priority',    cls: 'green'  };
+  if (score >= 75) return { label: "High", cls: "red" };
+  if (score >= 50) return { label: "Medium", cls: "yellow" };
+  return { label: "Low", cls: "green" };
 }
 
 function showScreen(id) {
@@ -169,9 +216,10 @@ function runLoader() {
   const interval = setInterval(() => {
     if (i >= steps.length) {
       clearInterval(interval);
-      setTimeout(() => {
-        calculateNGOScores();
-        updateUI();
+      setTimeout(async () => {
+        await calculateNGOScores();  
+        selectBestNGO();             
+        updateUI();                  
       }, 500);
       return;
     }
@@ -183,38 +231,16 @@ function runLoader() {
   }, 650);
 }
 
-function calculateNGOScores() {
-  const food = { expiryHours: state.expiryHours, quantity: state.quantity };
-
-  state.ngoList = NGO_REGISTRY.map((ngo) => {
-    const { finalScore, urgencyScore, distanceScore, capacityScore } =
-      calculateFoodLifeScore(food, ngo);
-
-    const { label: priorityLabel, cls: priorityClass } = getPriority(finalScore);
-    const capacityPct = Math.round(
-      ((ngo.capacityPerDay - ngo.currentLoad) / ngo.capacityPerDay) * 100
-    );
-
-    return {
-      ...ngo,
-      finalScore,
-      urgencyScore,
-      distanceScore,
-      capacityScore,
-      priorityLabel,
-      priorityClass,
-      capacityPct,
-    };
-  });
-
-  selectBestNGO();
-}
 
 function selectBestNGO() {
+  if (!state.ngoList.length) return;
+
   let best = state.ngoList[0];
+
   state.ngoList.forEach((ngo) => {
     if (ngo.finalScore > best.finalScore) best = ngo;
   });
+
   state.selectedNGO = best;
 }
 
@@ -297,16 +323,32 @@ function updateUI() {
 // ACTION HANDLERS
 
 function handleCall(ngoId) {
+  ngoId = parseInt(ngoId);  // 🔥 add this
+
   const ngo = state.ngoList.find((n) => n.id === ngoId);
   if (!ngo) return;
-  showToast('Connecting to ' + ngo.name + '...', 'Dialling ' + ngo.phone, 'info');
+
+  showToast('Connecting to ' + ngo.name + '...', 'Dialling...', 'info');
 }
 
 function handleRequest(ngoId) {
+  ngoId = parseInt(ngoId);  // 🔥 THIS LINE FIXES EVERYTHING
+
   const ngo = state.ngoList.find((n) => n.id === ngoId);
-  if (!ngo) return;
+
+  if (!ngo) {
+    console.log("NGO not found", ngoId);
+    return;
+  }
+
   state.selectedNGO = ngo;
-  showToast('Request sent to ' + ngo.name, 'ETA: ~' + ngo.travelTimeMin + ' min  |  Score: ' + ngo.finalScore, 'success');
+
+  showToast(
+    'Request sent to ' + ngo.name,
+    'ETA: ~' + ngo.travelTimeMin + ' min  |  Score: ' + ngo.finalScore,
+    'success'
+  );
+
   setTimeout(sendRequest, 2000);
 }
 
