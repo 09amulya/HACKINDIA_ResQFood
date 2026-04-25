@@ -1236,3 +1236,12 @@
     h2 { font-size: 1.4rem; }
     .card { padding: 24px; }
   }
+
+ .ngo-register-btn {
+  border: 1px solid #c9a86a;
+  background: transparent;
+  color: #c9a86a;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+}
