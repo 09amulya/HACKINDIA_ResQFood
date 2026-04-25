@@ -112,7 +112,11 @@
     font-weight: 700;
     letter-spacing: 2px;
     color: var(--gold);
+    cursor: pointer;
+    user-select: none;
   }
+
+  .logo:hover { opacity: 0.8; }
 
   .logo-crest {
     width: 38px; height: 38px;
@@ -210,7 +214,7 @@
     background: linear-gradient(90deg, var(--gold), var(--gold2));
   }
 
-  /* === SECTION HEADING === */
+  /*  SECTION HEADING */
   .section-tag {
     font-family: var(--mono);
     font-size: 0.6rem;
@@ -248,7 +252,7 @@
     font-style: italic;
   }
 
-  /* === DECORATIVE DIVIDER === */
+  /* DECORATIVE DIVIDER */
   .ornament {
     text-align: center;
     color: var(--gold);
@@ -258,7 +262,7 @@
     letter-spacing: 8px;
   }
 
-  /* === CARD === */
+  /* CARD */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
