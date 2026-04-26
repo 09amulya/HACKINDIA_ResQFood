@@ -4,7 +4,7 @@
 
 ---
 
-## 1.  Problem Definition (Precise, Not Emotional)
+## 1.  Problem Definition 
 
 India generates massive food waste, while millions remain food insecure.
 
@@ -50,7 +50,7 @@ Instead of “sending food somewhere”, we:
 
 ---
 
-## 4.  Core Algorithm (Explained Like an Engineer)
+## 4.  Core Algorithm 
 
 We use a **weighted scoring model**:
 
@@ -65,11 +65,11 @@ Score(NGO) =
 
 * Converts multi-factor decision → single comparable score
 * Allows **real-time ranking**
-* Easily tunable without retraining (unlike ML)
+* Easily tunable without retraining 
 
 ---
 
-## 5.  Key Design Decisions (This is where you win)
+## 5.  Key Design Decisions 
 
 ###  Why NOT Machine Learning?
 
