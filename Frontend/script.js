@@ -72,7 +72,7 @@ async function calculateNGOScores() {
       console.warn("Using fallback location");
       coords = { lat: 28.6139, lng: 77.2090 }; // fallback
     }
-    const res = await fetch("http://localhost:5000/api/users/match", {
+    const res = await fetch("https://hackindia-resqfood-4f3a.onrender.com", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
